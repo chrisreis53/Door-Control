@@ -60,6 +60,7 @@ int main()
     f_ethernet_init();
 #ifdef RUNASCLIENT
     TCPSocketConnection bldg_client;
+    bldg_client.set_blocking(true,1);
 #else
     TCPSocketServer server;
     server.bind(ECHO_SERVER_PORT);
@@ -79,14 +80,18 @@ int main()
     		attempt++;
     	}
     	while(bldg_client.is_connected()){
+    		int n;
     		pc.printf("Sending Data\n\r");
 
     		bldg_client.send("ID",2);
     		bldg_client.send(eth.getMACAddress(),strlen(eth.getMACAddress()));
-
-    		bldg_client.receive(str_bldg,64);
-    		bldg_client.receive(str_room,64);
-    		bldg_client.receive(str_doors,64);
+    		pc.printf("Receiving Data\n\r");
+    		n = bldg_client.receive(str_bldg,64);
+    		if(n < 0) break;
+    		n = bldg_client.receive(str_room,64);
+    		if(n < 0) break;
+    		n = bldg_client.receive(str_doors,64);
+    		if(n < 0) break;
     		pc.printf("Bldg: %s, Room: %s, Doors: %s\n\r", str_bldg, str_room, str_doors);
     		wait(5);
     	}
