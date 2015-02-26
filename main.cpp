@@ -25,17 +25,14 @@ void f_ethernet_init(void);
 void check_stream(char* buf);
 void egress_button(void);
 
-const char * IP_Addr    = "192.168.1.210";
-const char * IP_Subnet  = "255.255.255.0";
-const char * IP_Gateway = "192.168.1.1";
 char data[8];
 
 int ret;
 bool status;
 int max_attempts = 10;
-int count = 0;
 
 char paq_en[64];
+char * str0 = "<h1>Suck it Trebeck!</h1>";
 char str_bldg[128];
 char str_room[128];
 char str_doors[128];
@@ -63,7 +60,6 @@ int main()
     f_ethernet_init();
 #ifdef RUNASCLIENT
     TCPSocketConnection bldg_client;
-    bldg_client.set_blocking(true, 500);
 #else
     TCPSocketServer server;
     server.bind(ECHO_SERVER_PORT);
@@ -77,27 +73,22 @@ int main()
     	ret=bldg_client.connect(BLDG_SERVER_IP,ECHO_SERVER_PORT);
     	if(!ret){
     		pc.printf("\nConnected to Building Server\n\r");
+    		attempt = 0; //reset attempts
     	}else{
     		pc.printf("Connection Failed...This is attempt #%d of %d\n\r",attempt,max_attempts);
     		attempt++;
     	}
     	while(bldg_client.is_connected()){
-    		int n;
-    		max_attempts = 0;
     		pc.printf("Sending Data\n\r");
 
     		bldg_client.send("ID",2);
     		bldg_client.send(eth.getMACAddress(),strlen(eth.getMACAddress()));
-    		pc.printf("Receiving Data\n\r");
-    		n=bldg_client.receive_all(str_bldg,64);
-    		if(n <= 0) break;
-    		n=bldg_client.receive_all(str_room,64);
-    		if(n <= 0) break;
-    		n=bldg_client.receive_all(str_doors,64);
-    		if(n <= 0) break;
-    		pc.printf("Bldg: %s, Room: %s, Doors: %s\n\r", str_bldg, str_room, str_doors);
-    		//wait(1);
 
+    		bldg_client.receive(str_bldg,64);
+    		bldg_client.receive(str_room,64);
+    		bldg_client.receive(str_doors,64);
+    		pc.printf("Bldg: %s, Room: %s, Doors: %s\n\r", str_bldg, str_room, str_doors);
+    		wait(5);
     	}
     }
 #else

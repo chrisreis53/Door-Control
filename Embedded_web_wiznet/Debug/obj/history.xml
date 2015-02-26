@@ -25,17 +25,17 @@
       <target file="UDPSocket.o" lastModified="14bc3e872b7">
          <source file="..\..\..\WIZnet_Library\WIZnetInterface\Socket\UDPSocket.cpp" lastModified="14ba207a140"/>
       </target>
-      <target file="main.o" lastModified="14bc6f70aa3">
-         <source file="..\..\..\main.cpp" lastModified="14bc6f6a6ca"/>
+      <target file="main.o" lastModified="14bc705e8e9">
+         <source file="..\..\..\main.cpp" lastModified="14bc705857f"/>
       </target>
       <target file="TCPSocketServer.o" lastModified="14bc3e86f21">
          <source file="..\..\..\WIZnet_Library\WIZnetInterface\Socket\TCPSocketServer.cpp" lastModified="14ba207a140"/>
       </target>
-      <target file="DNSClient.o" lastModified="14bc3e87127">
-         <source file="..\..\..\WIZnet_Library\WIZnetInterface\DNSClient\DNSClient.cpp" lastModified="14ba207a140"/>
-      </target>
       <target file="W5500.o" lastModified="14bc3e873cc">
          <source file="..\..\..\WIZnet_Library\WIZnetInterface\WIZnet\W5500.cpp" lastModified="14ba207a140"/>
+      </target>
+      <target file="DNSClient.o" lastModified="14bc3e87127">
+         <source file="..\..\..\WIZnet_Library\WIZnetInterface\DNSClient\DNSClient.cpp" lastModified="14ba207a140"/>
       </target>
    </processor>
 </history>
