@@ -1,6 +1,6 @@
-//w5100
-#include "mbed.h"
-#include "WIZnetInterface.h"
+#include "mbed.h"				//mbed standard library
+#include "WIZnetInterface.h"	//Wiznet chipset interface
+#include "stm32f4xx_hal_iwdg.h"	//Independant Watchdog Timer
 #include "string.h"
 #include "strings.h"
 
@@ -11,19 +11,24 @@
 
 WIZnetInterface eth(SPI_MOSI, SPI_MISO, SPI_SCK,SPI_CS,PB_4); // spi, cs, reset
 Serial pc(SERIAL_TX,SERIAL_RX);
-// theres a conflict with LED1 on the Nucleo board it uses the same pin as SPI_SCK!
-//DigitalOut led(LED1);
-// This is the chip select for the sd card which shares the SPI bus on the Arduino shield.
-DigitalOut SD_CS(PB_5);
 
+IWDG_HandleTypeDef hiwdg;
+
+DigitalOut SD_CS(PB_5);		// This is the chip select for the sd card which shares the SPI bus on the Arduino shield.
 DigitalOut LED_1(PA_0,0);
 DigitalOut LED_2(PA_1,0);
 DigitalOut LED_3(PA_4,0);
 DigitalIn EGRESS(PB_0);
 
+//Prototypes
 void f_ethernet_init(void);
 void check_stream(char* buf);
 void egress_button(void);
+void watchdog_init(void);
+void watchdog_start(void);
+void watchdog_refresh(void);
+void watchdog_status(void);
+
 
 char data[8];
 
@@ -48,6 +53,10 @@ int main()
 	LED_1 = 0;
 	LED_2 = 0;
 	LED_3 = 0;
+
+	watchdog_init();
+	watchdog_status();
+	watchdog_start();
 // force the chip select for the SD card high to avoid collisions. We're not using the sd card for this program    
     char buffer[64];
     char data_entry[64];
@@ -69,6 +78,7 @@ int main()
 
 #ifdef RUNASCLIENT
     while(attempt <=  max_attempts){
+    	watchdog_refresh();
     	egress_button();
     	pc.printf("\nAttempting to Connect to Server...\n\r");
     	ret=bldg_client.connect(BLDG_SERVER_IP,ECHO_SERVER_PORT);
@@ -80,6 +90,7 @@ int main()
     		attempt++;
     	}
     	while(bldg_client.is_connected()){
+    		watchdog_refresh();
     		int n;
     		pc.printf("Sending Data\n\r");
 
@@ -93,7 +104,7 @@ int main()
     		n = bldg_client.receive(str_doors,64);
     		if(n < 0) break;
     		pc.printf("Bldg: %s, Room: %s, Doors: %s\n\r", str_bldg, str_room, str_doors);
-    		wait(5);
+    		wait(1);
     	}
     }
 #else
@@ -181,5 +192,44 @@ void egress_button(void){
 	if(EGRESS){
 		pc.printf("EGRESS DEPRESSED");
 		LED_1=1;
+	}
+}
+
+void watchdog_init(void){
+
+	hiwdg.Instance = IWDG;
+	hiwdg.Init.Prescaler = IWDG_PRESCALER_256;
+	hiwdg.Init.Reload = 1350; //10 seconds
+	HAL_IWDG_Init(&hiwdg);
+
+}
+
+void watchdog_start(void){
+	HAL_IWDG_Start(&hiwdg);
+}
+
+void watchdog_refresh(void){
+	HAL_IWDG_Refresh(&hiwdg);
+}
+
+void watchdog_status(void){
+	switch (HAL_IWDG_GetState(&hiwdg)){
+		case HAL_IWDG_STATE_RESET:
+			pc.printf("IWDG not yet initialized or disabled\r\n");
+			break;
+		case HAL_IWDG_STATE_READY:
+			pc.printf("IWDG initialized and ready for use\r\n");
+			break;
+		case HAL_IWDG_STATE_BUSY:
+			pc.printf("IWDG internal process is ongoing\r\n");
+			break;
+		case HAL_IWDG_STATE_TIMEOUT:
+			pc.printf("IWDG timeout state\r\n");
+			break;
+		case HAL_IWDG_STATE_ERROR:
+			pc.printf("IWDG error state\r\n");
+			break;
+		default:
+			pc.printf("Unknown state\n\r");
 	}
 }
