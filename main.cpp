@@ -7,12 +7,11 @@
 
 #define ECHO_SERVER_PORT	9999
 #define	BLDG_SERVER_IP		"192.168.1.104"
-#define RUNASCLIENT			//Changes code to connect to a server or run standalone
 
 WIZnetInterface eth(SPI_MOSI, SPI_MISO, SPI_SCK,SPI_CS,PB_4); // spi, cs, reset
 Serial pc(SERIAL_TX,SERIAL_RX);
 
-IWDG_HandleTypeDef hiwdg;
+IWDG_HandleTypeDef hiwdg;	//Watchdog timer
 
 DigitalOut SD_CS(PB_5);		// This is the chip select for the sd card which shares the SPI bus on the Arduino shield.
 DigitalOut LED_1(PA_0,0);
@@ -30,12 +29,9 @@ void watchdog_refresh(void);
 void watchdog_status(void);
 
 
-char data[8];
-
 int ret;
 bool status;
 int max_attempts = 10;
-
 char paq_en[64];
 char * str0 = "<h1>Suck it Trebeck!</h1>";
 char str_bldg[128];
@@ -43,6 +39,11 @@ char str_room[128];
 char str_doors[128];
 char * str_MAC = "MAC";
 uint8_t mac[]={0x90,0xa2,0xDa,0x0d,0x42,0xe0};
+char buffer[64];
+char data_entry[64];
+char data[512];
+int attempt=1;
+int entry=42;
 
 int main()
 {
@@ -58,25 +59,17 @@ int main()
 	watchdog_status();
 	watchdog_start();
 // force the chip select for the SD card high to avoid collisions. We're not using the sd card for this program    
-    char buffer[64];
-    char data_entry[64];
-    char data[512];
+
     SD_CS=1;
     //uint8_t mac[]={0x90,0xa2,0xDa,0x0d,0x42,0xe0};
-    int attempt=1;
-    int entry=42;
+
     int length;
     f_ethernet_init();
-#ifdef RUNASCLIENT
+
     TCPSocketConnection bldg_client;
     bldg_client.set_blocking(true,1);
-#else
-    TCPSocketServer server;
-    server.bind(ECHO_SERVER_PORT);
-    server.listen();
-#endif
 
-#ifdef RUNASCLIENT
+
     while(attempt <=  max_attempts){
     	watchdog_refresh();
     	egress_button();
@@ -107,39 +100,6 @@ int main()
     		wait(1);
     	}
     }
-#else
-    while(true){
-
-    	pc.printf("\nWaiting for Connection\n\r");
-    	TCPSocketConnection client;
-    	server.accept(client);
-
-    	pc.printf("Connection from: %s\n", client.get_address());
-    	char buffer[256];
-
-    	client.send(str0,strlen(str0));
-    	sprintf(data,"<h2> MAC: %s <br> IP %s <\h2>",eth.getMACAddress(),eth.getIPAddress());
-    	client.send(data,strlen(data));
-    	wait(.1);
-    	client.close();
-
-    	while(true){
-
-    		int n = client.receive(buffer, sizeof(buffer));
-    		if (n<=0) break;
-
-    		client.send_all(buffer,n);
-    		if (n<=0) break;
-
-    		check_stream(buffer);
-
-    	}
-    	wait(10);
-    	pc.printf("\n***Closing Client***\n\r");
-    	client.close();
-    	//break;
-    }
-#endif
     
 }
 
