@@ -6,7 +6,7 @@
 
 
 #define ECHO_SERVER_PORT	9999
-#define	BLDG_SERVER_IP		"192.168.1.102"
+#define	BLDG_SERVER_IP		"192.168.1.104"
 #define RUNASCLIENT			//Changes code to connect to a server or run standalone
 
 WIZnetInterface eth(SPI_MOSI, SPI_MISO, SPI_SCK,SPI_CS,PB_4); // spi, cs, reset
@@ -32,10 +32,10 @@ char data[8];
 
 int ret;
 bool status;
-int max_attempts = 4;
+int max_attempts = 10;
+int count = 0;
 
 char paq_en[64];
-char * str0 = "<h1>Suck it Trebeck!</h1>";
 char str_bldg[128];
 char str_room[128];
 char str_doors[128];
@@ -63,6 +63,7 @@ int main()
     f_ethernet_init();
 #ifdef RUNASCLIENT
     TCPSocketConnection bldg_client;
+    bldg_client.set_blocking(true, 500);
 #else
     TCPSocketServer server;
     server.bind(ECHO_SERVER_PORT);
@@ -81,16 +82,22 @@ int main()
     		attempt++;
     	}
     	while(bldg_client.is_connected()){
+    		int n;
+    		max_attempts = 0;
     		pc.printf("Sending Data\n\r");
 
     		bldg_client.send("ID",2);
     		bldg_client.send(eth.getMACAddress(),strlen(eth.getMACAddress()));
-
-    		bldg_client.receive(str_bldg,64);
-    		bldg_client.receive(str_room,64);
-    		bldg_client.receive(str_doors,64);
+    		pc.printf("Receiving Data\n\r");
+    		n=bldg_client.receive_all(str_bldg,64);
+    		if(n <= 0) break;
+    		n=bldg_client.receive_all(str_room,64);
+    		if(n <= 0) break;
+    		n=bldg_client.receive_all(str_doors,64);
+    		if(n <= 0) break;
     		pc.printf("Bldg: %s, Room: %s, Doors: %s\n\r", str_bldg, str_room, str_doors);
-    		wait(5);
+    		//wait(1);
+
     	}
     }
 #else
