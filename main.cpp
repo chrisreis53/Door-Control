@@ -14,15 +14,16 @@ Serial pc(SERIAL_TX,SERIAL_RX);
 IWDG_HandleTypeDef hiwdg;	//Watchdog timer
 
 DigitalOut SD_CS(PB_5);		// This is the chip select for the sd card which shares the SPI bus on the Arduino shield.
-DigitalOut LED_1(PA_0,0);
-DigitalOut LED_2(PA_1,0);
-DigitalOut LED_3(PA_4,0);
+DigitalOut DOOR_1(PA_0,0);
+DigitalOut DOOR_2(PA_1,0);
+DigitalOut DOOR_3(PA_4,0);
 DigitalIn EGRESS(PB_0);
 
 //Prototypes
 void f_ethernet_init(void);
 void check_stream(char* buf);
 void egress_button(void);
+void led_check();
 void watchdog_init(void);
 void watchdog_start(void);
 void watchdog_refresh(void);
@@ -47,13 +48,13 @@ int entry=42;
 
 int main()
 {
-	LED_1 = 1;
-	LED_2 = 1;
-	LED_3 = 1;
+	DOOR_1 = 1;
+	DOOR_2 = 1;
+	DOOR_3 = 1;
 	wait(1);
-	LED_1 = 0;
-	LED_2 = 0;
-	LED_3 = 0;
+	DOOR_1 = 0;
+	DOOR_2 = 0;
+	DOOR_3 = 0;
 
 	watchdog_init();
 	watchdog_status();
@@ -83,20 +84,18 @@ int main()
     		attempt++;
     	}
     	while(bldg_client.is_connected()){
-    		watchdog_refresh();
+    		watchdog_refresh();		//Kick the dog
     		int n;
     		pc.printf("Sending Data\n\r");
-
     		bldg_client.send("ID",2);
     		bldg_client.send(eth.getMACAddress(),strlen(eth.getMACAddress()));
     		pc.printf("Receiving Data\n\r");
-    		n = bldg_client.receive(str_bldg,64);
+    		n = bldg_client.receive(data,512);
     		if(n < 0) break;
-    		n = bldg_client.receive(str_room,64);
-    		if(n < 0) break;
-    		n = bldg_client.receive(str_doors,64);
-    		if(n < 0) break;
-    		pc.printf("Bldg: %s, Room: %s, Doors: %s\n\r", str_bldg, str_room, str_doors);
+    		pc.printf("Data: %s\r\n",data);
+    		egress_button();
+    		check_stream(data);
+    		//pc.printf("Bldg: %s, Room: %s, Doors: %s\n\r", str_bldg, str_room, str_doors);
     		wait(1);
     	}
     }
@@ -119,11 +118,13 @@ void f_ethernet_init()
         pc.printf("Communication Failure  ... Restart devices ...\n\r");    
     }
     pc.printf("Connecting");
-    wait(0.5);
+    wait(0.25);
     pc.printf(".");
-    wait(0.5);
+    wait(0.25);
+    pc.printf(".");
+    wait(0.25);
     pc.printf(".\n\r");
-    wait(0.5);
+    wait(0.25);
     ret = eth.connect();
     if(!ret)
     {
@@ -139,11 +140,21 @@ void f_ethernet_init()
  
 void check_stream(char* buf){
 
-	for(int i = 0;i<sizeof(buf);i++){
-		if(buf[i] == 'L' && buf[i+1] == 'E' && buf[i+2] == 'D'){
-			LED_1 = !LED_1;
-		}else if(buf[i] == 'D' && buf[i+1] == 'A' && buf[i+2] == 'T' && buf[i+3] == 'A'){
-			pc.printf("Data Received");
+	for(int i = 0;i<strlen(buf);i++){
+//		if(buf[i] == 'L' && buf[i+1] == 'E' && buf[i+2] == 'D'){
+//			DOOR_1 = !DOOR_1;
+//		}
+//		if(buf[i] == 'D' && buf[i+1] == 'A' && buf[i+2] == 'T' && buf[i+3] == 'A'){
+//			pc.printf("Data Received\n\r");
+//		}
+		pc.putc(buf[i]);
+		if(buf[i] == 'D' && buf[i+1] == 'O' && buf[i+2] == 'O' && buf[i+3] == 'R' && buf[i+4] == '1' && buf[i+5] == '1'){
+			pc.printf("Door 1 Engaged\r\n");
+			DOOR_1 = 1;
+		}
+		if(buf[i] == 'D' && buf[i+1] == 'O' && buf[i+2] == 'O' && buf[i+3] == 'R' && buf[i+4] == '1' && buf[i+5] == '0'){
+			pc.printf("Door 1 Disengaged\r\n");
+			DOOR_1 = 0;
 		}
 	}
 }
@@ -151,7 +162,9 @@ void check_stream(char* buf){
 void egress_button(void){
 	if(EGRESS){
 		pc.printf("EGRESS DEPRESSED");
-		LED_1=1;
+		DOOR_1=1;
+		wait(5);
+		DOOR_1=0;
 	}
 }
 
