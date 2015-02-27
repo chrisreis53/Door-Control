@@ -158,9 +158,9 @@
     <File name="headers/mbed/TARGET_NUCLEO_F401RE/stm32f4xx_hal_crc.h" path="mbed/TARGET_NUCLEO_F401RE/stm32f4xx_hal_crc.h" type="1"/>
     <File name="sources/WIZnet_Library/WIZnetInterface/DNSClient" path="" type="2"/>
     <File name="headers/mbed/AnalogIn.h" path="mbed/AnalogIn.h" type="1"/>
+    <File name="headers/WIZnet_Library/WIZnetInterface/WIZnet/W5100.h" path="WIZnet_Library/WIZnetInterface/WIZnet/W5100.h" type="1"/>
     <File name="headers/WIZnet_Library/WIZnetInterface/WIZnet/wiznet.h" path="WIZnet_Library/WIZnetInterface/WIZnet/wiznet.h" type="1"/>
     <File name="headers/mbed/TARGET_NUCLEO_F401RE/core_caFunc.h" path="mbed/TARGET_NUCLEO_F401RE/core_caFunc.h" type="1"/>
-    <File name="headers/WIZnet_Library/WIZnetInterface/WIZnet/W5100.h" path="WIZnet_Library/WIZnetInterface/WIZnet/W5100.h" type="1"/>
     <File name="headers/mbed/TARGET_NUCLEO_F401RE/TARGET_STM/TARGET_NUCLEO_F401RE/objects.h" path="mbed/TARGET_NUCLEO_F401RE/TARGET_STM/TARGET_NUCLEO_F401RE/objects.h" type="1"/>
     <File name="headers/mbed/TARGET_NUCLEO_F401RE/stm32f4xx_hal_sram.h" path="mbed/TARGET_NUCLEO_F401RE/stm32f4xx_hal_sram.h" type="1"/>
     <File name="headers/mbed/TARGET_NUCLEO_F401RE/TARGET_STM/TARGET_NUCLEO_F401RE" path="" type="2"/>
@@ -194,10 +194,10 @@
     <File name="headers/mbed/BusOut.h" path="mbed/BusOut.h" type="1"/>
     <File name="headers/mbed/TARGET_NUCLEO_F401RE/stm32f4xx_hal_adc_ex.h" path="mbed/TARGET_NUCLEO_F401RE/stm32f4xx_hal_adc_ex.h" type="1"/>
     <File name="headers/mbed/Timer.h" path="mbed/Timer.h" type="1"/>
-    <File name="headers/mbed/TARGET_NUCLEO_F401RE/stm32f4xx_hal_rcc_ex.h" path="mbed/TARGET_NUCLEO_F401RE/stm32f4xx_hal_rcc_ex.h" type="1"/>
-    <File name="headers/mbed/TARGET_NUCLEO_F401RE/stm32f4xx_hal_uart.h" path="mbed/TARGET_NUCLEO_F401RE/stm32f4xx_hal_uart.h" type="1"/>
-    <File name="headers/mbed/TARGET_NUCLEO_F401RE/core_ca9.h" path="mbed/TARGET_NUCLEO_F401RE/core_ca9.h" type="1"/>
     <File name="headers/mbed/port_api.h" path="mbed/port_api.h" type="1"/>
+    <File name="headers/mbed/TARGET_NUCLEO_F401RE/stm32f4xx_hal_uart.h" path="mbed/TARGET_NUCLEO_F401RE/stm32f4xx_hal_uart.h" type="1"/>
+    <File name="headers/mbed/TARGET_NUCLEO_F401RE/stm32f4xx_hal_rcc_ex.h" path="mbed/TARGET_NUCLEO_F401RE/stm32f4xx_hal_rcc_ex.h" type="1"/>
+    <File name="headers/mbed/TARGET_NUCLEO_F401RE/core_ca9.h" path="mbed/TARGET_NUCLEO_F401RE/core_ca9.h" type="1"/>
     <File name="headers/mbed/semihost_api.h" path="mbed/semihost_api.h" type="1"/>
     <File name="headers/mbed/TARGET_NUCLEO_F401RE/stm32f4xx_hal_i2s.h" path="mbed/TARGET_NUCLEO_F401RE/stm32f4xx_hal_i2s.h" type="1"/>
     <File name="headers/mbed/TARGET_NUCLEO_F401RE/stm32f4xx_hal_gpio.h" path="mbed/TARGET_NUCLEO_F401RE/stm32f4xx_hal_gpio.h" type="1"/>
