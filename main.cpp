@@ -1,105 +1,85 @@
-#include "mbed.h"				//mbed standard library
-#include "WIZnetInterface.h"	//Wiznet chipset interface
-#include "stm32f4xx_hal_iwdg.h"	//Independant Watchdog Timer
-#include "string.h"
-#include "strings.h"
+/*
+*
+*  Test program for W5500 mbed Library
+*
+*/
+#include "mbed.h"
+#include "WIZnetInterface.h"
+#include "stm32f10x_iwdg.h"
+ 
+#define ECHO_SERVER_PORT    9999
+#define BLDG_SERVER_IP      "192.168.0.21"
 
-
-#define ECHO_SERVER_PORT	9999
-#define	BLDG_SERVER_IP		"192.168.1.104"
-
-WIZnetInterface eth(SPI_MOSI, SPI_MISO, SPI_SCK,SPI_CS,PB_4); // spi, cs, reset
-Serial pc(SERIAL_TX,SERIAL_RX);
-
-IWDG_HandleTypeDef hiwdg;	//Watchdog timer
-
-DigitalOut SD_CS(PB_5);		// This is the chip select for the sd card which shares the SPI bus on the Arduino shield.
-DigitalOut DOOR_1(PA_0,0);
-DigitalOut DOOR_2(PA_1,0);
-DigitalOut DOOR_3(PA_4,0);
-DigitalIn EGRESS(PB_0);
-
-//Prototypes
-void f_ethernet_init(void);
 void check_stream(char* buf);
-void egress_button(void);
-void led_check();
-void watchdog_init(void);
-void watchdog_start(void);
-void watchdog_refresh(void);
-void watchdog_status(void);
+void f_ethernet_init();
+void set_doors(int a,int b,int c, int d,int e,int f,int g,int h);
 
+DigitalOut DOOR_1(PC_6);
+DigitalOut DOOR_2(PC_7);
+DigitalOut DOOR_3(PC_8);
+DigitalOut DOOR_4(PC_9);
+DigitalOut DOOR_5(PA_8);
+DigitalOut DOOR_6(PA_15);
+DigitalOut DOOR_7(PC_10);
+DigitalOut DOOR_8(PC_11);
+ 
 
-int ret;
-bool status;
-int max_attempts = 10;
-char paq_en[64];
-char * str0 = "<h1>Suck it Trebeck!</h1>";
-char str_bldg[128];
-char str_room[128];
-char str_doors[128];
-char * str_MAC = "MAC";
-uint8_t mac[]={0x90,0xa2,0xDa,0x0d,0x42,0xe0};
-char buffer[64];
-char data_entry[64];
-char data[512];
+SPI spi(PB_15,PB_14,PB_13); // mosi, miso, sclk
+WIZnetInterface eth(&spi, PB_12, PB_0); // spi, cs, reset
+Serial pc(PA_9,PA_10);
+DigitalOut led(PC_4);
+
+// for static IP setting
+const char * IP_Addr    = "192.168.1.120";
+const char * IP_Subnet  = "255.255.255.0";
+const char * IP_Gateway = "192.168.1.111";
+
+char DOOR[8];
 int attempt=1;
-int entry=42;
+int max_attempts = 10;
+int ret;
+char data[512];
 
+ 
 int main()
 {
-	DOOR_1 = 1;
-	DOOR_2 = 1;
-	DOOR_3 = 1;
-	wait(1);
-	DOOR_1 = 0;
-	DOOR_2 = 0;
-	DOOR_3 = 0;
 
-	watchdog_init();
-	watchdog_status();
-	watchdog_start();
-// force the chip select for the SD card high to avoid collisions. We're not using the sd card for this program    
-
-    SD_CS=1;
-    //uint8_t mac[]={0x90,0xa2,0xDa,0x0d,0x42,0xe0};
-
-    int length;
-    f_ethernet_init();
-
+    set_doors(1,1,1,1,1,1,1,1);
+    wait(2);
+    set_doors(0,0,0,0,0,0,0,0);
+    
+    f_ethernet_init();    
     TCPSocketConnection bldg_client;
     bldg_client.set_blocking(true,1);
 
-
     while(attempt <=  max_attempts){
-    	watchdog_refresh();
-    	egress_button();
-    	pc.printf("\nAttempting to Connect to Server...\n\r");
-    	ret=bldg_client.connect(BLDG_SERVER_IP,ECHO_SERVER_PORT);
-    	if(!ret){
-    		pc.printf("\nConnected to Building Server\n\r");
-    		attempt = 0; //reset attempts
-    	}else{
-    		pc.printf("Connection Failed...This is attempt #%d of %d\n\r",attempt,max_attempts);
-    		attempt++;
-    	}
-    	while(bldg_client.is_connected()){
-    		watchdog_refresh();		//Kick the dog
-    		int n;
-    		pc.printf("Sending Data\n\r");
-    		bldg_client.send("ID",2);
-    		bldg_client.send(eth.getMACAddress(),strlen(eth.getMACAddress()));
-    		pc.printf("Receiving Data\n\r");
-    		n = bldg_client.receive(data,512);
-    		if(n < 0) break;
-    		pc.printf("Data: %s\r\n",data);
-    		egress_button();
-    		check_stream(data);
-    		//pc.printf("Bldg: %s, Room: %s, Doors: %s\n\r", str_bldg, str_room, str_doors);
-    		wait(1);
-    	}
+        //TODO watchdog_refresh();
+        //TODO egress_button();
+        pc.printf("\nAttempting to Connect to Server...\n\r");
+        ret=bldg_client.connect(BLDG_SERVER_IP,ECHO_SERVER_PORT);
+        if(!ret){
+            pc.printf("\nConnected to Building Server\n\r");
+            attempt = 0; //reset attempts
+        }else{
+            pc.printf("Connection Failed...This is attempt #%d of %d\n\r",attempt,max_attempts);
+            attempt++;
+        }
+        while(bldg_client.is_connected()){
+            // TODO watchdog_refresh();     //Kick the dog
+            int n;
+            //pc.printf("Sending Data\n\r");
+            bldg_client.send("ID",2);
+            bldg_client.send(eth.getMACAddress(),strlen(eth.getMACAddress()));
+            //pc.printf("Receiving Data\n\r");
+            n = bldg_client.receive(data,512);
+            if(n < 0) break;
+            //pc.printf("Data: %s\r\n",data);
+            //TODO egress_button();
+            check_stream(data);
+            //pc.printf("Bldg: %s, Room: %s, Doors: %s\n\r", str_bldg, str_room, str_doors);
+            wait(1);
+        }
     }
-    
 }
 
 void f_ethernet_init()
@@ -117,7 +97,7 @@ void f_ethernet_init()
     {
         pc.printf("Communication Failure  ... Restart devices ...\n\r");    
     }
-    pc.printf("Connecting");
+    pc.printf("Connecting to building server @ %s on port %d",BLDG_SERVER_IP, ECHO_SERVER_PORT );
     wait(0.25);
     pc.printf(".");
     wait(0.25);
@@ -137,72 +117,29 @@ void f_ethernet_init()
         pc.printf("Communication Failure  ... Restart devices ...\n\r"); 
     }
 }  
- 
-void check_stream(char* buf){
 
-	for(int i = 0;i<strlen(buf);i++){
-//		if(buf[i] == 'L' && buf[i+1] == 'E' && buf[i+2] == 'D'){
-//			DOOR_1 = !DOOR_1;
-//		}
-//		if(buf[i] == 'D' && buf[i+1] == 'A' && buf[i+2] == 'T' && buf[i+3] == 'A'){
-//			pc.printf("Data Received\n\r");
-//		}
-		pc.putc(buf[i]);
-		if(buf[i] == 'D' && buf[i+1] == 'O' && buf[i+2] == 'O' && buf[i+3] == 'R' && buf[i+4] == '1' && buf[i+5] == '1'){
-			pc.printf("Door 1 Engaged\r\n");
-			DOOR_1 = 1;
-		}
-		if(buf[i] == 'D' && buf[i+1] == 'O' && buf[i+2] == 'O' && buf[i+3] == 'R' && buf[i+4] == '1' && buf[i+5] == '0'){
-			pc.printf("Door 1 Disengaged\r\n");
-			DOOR_1 = 0;
-		}
-	}
+void check_stream(char* buf)
+{
+
+    for(int i = 0; i<strlen(buf); i++) {
+
+        if(buf[i] == 'D' && buf[i+1] == 'O' && buf[i+2] == 'O' && buf[i+3] == 'R' && buf[i+4] == ':') {
+            pc.printf("%d,%d,%d,%d,%d,%d,%d,%d",buf[i+5],buf[i+6],buf[i+7],buf[i+8],buf[i+9],buf[i+10],buf[i+11],buf[i+12]);
+            set_doors(buf[i+5]-'0',buf[i+6]-'0',buf[i+7]-'0',buf[i+8]-'0',buf[i+9]-'0',buf[i+10]-'0',buf[i+11]-'0',buf[i+12]-'0');
+            
+        }
+
+    }
 }
 
-void egress_button(void){
-	if(EGRESS){
-		pc.printf("EGRESS DEPRESSED");
-		DOOR_1=1;
-		wait(5);
-		DOOR_1=0;
-	}
-}
-
-void watchdog_init(void){
-
-	hiwdg.Instance = IWDG;
-	hiwdg.Init.Prescaler = IWDG_PRESCALER_256;
-	hiwdg.Init.Reload = 1350; //10 seconds
-	HAL_IWDG_Init(&hiwdg);
-
-}
-
-void watchdog_start(void){
-	HAL_IWDG_Start(&hiwdg);
-}
-
-void watchdog_refresh(void){
-	HAL_IWDG_Refresh(&hiwdg);
-}
-
-void watchdog_status(void){
-	switch (HAL_IWDG_GetState(&hiwdg)){
-		case HAL_IWDG_STATE_RESET:
-			pc.printf("IWDG not yet initialized or disabled\r\n");
-			break;
-		case HAL_IWDG_STATE_READY:
-			pc.printf("IWDG initialized and ready for use\r\n");
-			break;
-		case HAL_IWDG_STATE_BUSY:
-			pc.printf("IWDG internal process is ongoing\r\n");
-			break;
-		case HAL_IWDG_STATE_TIMEOUT:
-			pc.printf("IWDG timeout state\r\n");
-			break;
-		case HAL_IWDG_STATE_ERROR:
-			pc.printf("IWDG error state\r\n");
-			break;
-		default:
-			pc.printf("Unknown state\n\r");
-	}
+void set_doors(int a,int b,int c, int d,int e,int f,int g,int h){
+    
+    DOOR_1 = a;
+    DOOR_2 = b;    
+    DOOR_3 = c;
+    DOOR_4 = d;
+    DOOR_5 = e;
+    DOOR_6 = f;
+    DOOR_7 = g;
+    DOOR_8 = h;
 }
