@@ -13,6 +13,8 @@
 void check_stream(char* buf);
 void f_ethernet_init();
 void set_doors(int a,int b,int c, int d,int e,int f,int g,int h);
+void watchdog_init(void);
+void watchdog_kick(void);
 
 DigitalOut DOOR_1(PC_6);
 DigitalOut DOOR_2(PC_7);
@@ -22,7 +24,7 @@ DigitalOut DOOR_5(PA_8);
 DigitalOut DOOR_6(PA_15);
 DigitalOut DOOR_7(PC_10);
 DigitalOut DOOR_8(PC_11);
- 
+
 
 SPI spi(PB_15,PB_14,PB_13); // mosi, miso, sclk
 WIZnetInterface eth(&spi, PB_12, PB_0); // spi, cs, reset
@@ -38,22 +40,24 @@ char DOOR[8];
 int attempt=1;
 int max_attempts = 10;
 int ret;
+int watchTimeMs = 10000;
 char data[512];
 
  
 int main()
 {
-
+	watchdog_init();
     set_doors(1,1,1,1,1,1,1,1);
     wait(2);
     set_doors(0,0,0,0,0,0,0,0);
+    //watchdog_kick();
     
     f_ethernet_init();    
     TCPSocketConnection bldg_client;
     bldg_client.set_blocking(true,1);
 
     while(attempt <=  max_attempts){
-        //TODO watchdog_refresh();
+    	watchdog_kick();
         //TODO egress_button();
         pc.printf("\nAttempting to Connect to Server...\n\r");
         ret=bldg_client.connect(BLDG_SERVER_IP,ECHO_SERVER_PORT);
@@ -65,7 +69,7 @@ int main()
             attempt++;
         }
         while(bldg_client.is_connected()){
-            // TODO watchdog_refresh();     //Kick the dog
+        	watchdog_kick();     //Kick the dog
             int n;
             //pc.printf("Sending Data\n\r");
             bldg_client.send("ID",2);
@@ -84,6 +88,7 @@ int main()
 
 void f_ethernet_init()
 {
+	//watchdog_kick();
     uint8_t mac[]={0x90,0xa2,0xDa,0x0d,0x42,0xe0};
     // mbed_mac_address((char *)mac); 
     pc.printf("\n\r####Starting Ethernet Server#### \n\r");
@@ -142,4 +147,25 @@ void set_doors(int a,int b,int c, int d,int e,int f,int g,int h){
     DOOR_6 = f;
     DOOR_7 = g;
     DOOR_8 = h;
+}
+
+void watchdog_init(void){
+	/* Check if the system has resumed from IWDG reset */
+	if (RCC_GetFlagStatus(RCC_FLAG_IWDGRST) != RESET)
+	{
+		/* Clear reset flags */
+		RCC_ClearFlag();
+	}
+	IWDG_WriteAccessCmd(IWDG_WriteAccess_Enable);
+	IWDG_SetPrescaler(IWDG_Prescaler_256);	// RTC clock = LSI (40kHz) / 256 = 156.3Hz (0.1563kHz)
+	IWDG_SetReload(350);		// X / 156.3Hz = 10 seconds (1563) yeah...idk what's going on here
+	IWDG_WriteAccessCmd(IWDG_WriteAccess_Disable);
+
+	IWDG_Enable();
+}
+
+void watchdog_kick(void){
+
+	IWDG_ReloadCounter();
+
 }
