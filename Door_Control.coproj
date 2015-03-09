@@ -200,10 +200,12 @@
   </Target>
   <Components path="./"/>
   <Files>
+    <File name="headers/mbed/TARGET_NUCLEO_F103RB/stm32f1xx_hal_iwdg.h" path="mbed/TARGET_NUCLEO_F103RB/stm32f1xx_hal_iwdg.h" type="1"/>
     <File name="headers/WIZnet_Library/WIZnetInterface/Socket/TCPSocketConnection.h" path="WIZnet_Library/WIZnetInterface/Socket/TCPSocketConnection.h" type="1"/>
     <File name="headers/mbed/sleep_api.h" path="mbed/sleep_api.h" type="1"/>
     <File name="headers/mbed/InterruptIn.h" path="mbed/InterruptIn.h" type="1"/>
     <File name="sources/WIZnet_Library/WIZnetInterface/Socket" path="" type="2"/>
+    <File name="headers/mbed/TARGET_NUCLEO_F103RB/stm32f1xx_hal_conf.h" path="mbed/TARGET_NUCLEO_F103RB/stm32f1xx_hal_conf.h" type="1"/>
     <File name="headers/mbed/TARGET_NUCLEO_F103RB/TARGET_STM/TARGET_NUCLEO_F103RB/objects.h" path="mbed/TARGET_NUCLEO_F103RB/TARGET_STM/TARGET_NUCLEO_F103RB/objects.h" type="1"/>
     <File name="headers/WIZnet_Library/WIZnetInterface/DHCPClient" path="" type="2"/>
     <File name="headers/mbed/TARGET_NUCLEO_F103RB/stm32f10x_wwdg.h" path="mbed/TARGET_NUCLEO_F103RB/stm32f10x_wwdg.h" type="1"/>
@@ -211,8 +213,8 @@
     <File name="headers/mbed/TARGET_NUCLEO_F103RB/stm32f10x_iwdg.h" path="mbed/TARGET_NUCLEO_F103RB/stm32f10x_iwdg.h" type="1"/>
     <File name="headers/mbed/TARGET_NUCLEO_F103RB/cmsis_nvic.h" path="mbed/TARGET_NUCLEO_F103RB/cmsis_nvic.h" type="1"/>
     <File name="headers/mbed/TARGET_NUCLEO_F103RB/core_cm0.h" path="mbed/TARGET_NUCLEO_F103RB/core_cm0.h" type="1"/>
-    <File name="headers/mbed/spi_api.h" path="mbed/spi_api.h" type="1"/>
     <File name="headers/mbed/TARGET_NUCLEO_F103RB/TARGET_STM/TARGET_NUCLEO_F103RB/gpio_object.h" path="mbed/TARGET_NUCLEO_F103RB/TARGET_STM/TARGET_NUCLEO_F103RB/gpio_object.h" type="1"/>
+    <File name="headers/mbed/spi_api.h" path="mbed/spi_api.h" type="1"/>
     <File name="sources/WIZnet_Library/WIZnetInterface/Socket/UDPSocket.cpp" path="WIZnet_Library/WIZnetInterface/Socket/UDPSocket.cpp" type="1"/>
     <File name="headers/WIZnet_Library/WIZnetInterface/DNSClient" path="" type="2"/>
     <File name="headers/mbed/FilePath.h" path="mbed/FilePath.h" type="1"/>
@@ -221,9 +223,10 @@
     <File name="sources/WIZnet_Library/WIZnetInterface/Socket/TCPSocketConnection.cpp" path="WIZnet_Library/WIZnetInterface/Socket/TCPSocketConnection.cpp" type="1"/>
     <File name="headers/mbed/TARGET_NUCLEO_F103RB/core_cm0plus.h" path="mbed/TARGET_NUCLEO_F103RB/core_cm0plus.h" type="1"/>
     <File name="headers/mbed/CAN.h" path="mbed/CAN.h" type="1"/>
-    <File name="headers/WIZnet_Library/WIZnetInterface/Socket/Endpoint.h" path="WIZnet_Library/WIZnetInterface/Socket/Endpoint.h" type="1"/>
-    <File name="headers" path="" type="2"/>
     <File name="headers/mbed/pinmap.h" path="mbed/pinmap.h" type="1"/>
+    <File name="headers" path="" type="2"/>
+    <File name="headers/mbed/TARGET_NUCLEO_F103RB/stm32f1xx_hal.c" path="mbed/TARGET_NUCLEO_F103RB/stm32f1xx_hal.c" type="1"/>
+    <File name="headers/WIZnet_Library/WIZnetInterface/Socket/Endpoint.h" path="WIZnet_Library/WIZnetInterface/Socket/Endpoint.h" type="1"/>
     <File name="headers/WIZnet_Library/WIZnetInterface/WIZnet/W5200.h" path="WIZnet_Library/WIZnetInterface/WIZnet/W5200.h" type="1"/>
     <File name="headers/mbed/rtc_api.h" path="mbed/rtc_api.h" type="1"/>
     <File name="sources/WIZnet_Library/WIZnetInterface/WIZnet/W5200.cpp" path="WIZnet_Library/WIZnetInterface/WIZnet/W5200.cpp" type="1"/>
@@ -246,8 +249,8 @@
     <File name="headers/mbed/platform.h" path="mbed/platform.h" type="1"/>
     <File name="headers/mbed/TARGET_NUCLEO_F103RB/core_caInstr.h" path="mbed/TARGET_NUCLEO_F103RB/core_caInstr.h" type="1"/>
     <File name="headers/mbed/TARGET_NUCLEO_F103RB/core_cmInstr.h" path="mbed/TARGET_NUCLEO_F103RB/core_cmInstr.h" type="1"/>
-    <File name="headers/mbed/TARGET_NUCLEO_F103RB/stm32f10x_bkp.h" path="mbed/TARGET_NUCLEO_F103RB/stm32f10x_bkp.h" type="1"/>
     <File name="headers/mbed/Stream.h" path="mbed/Stream.h" type="1"/>
+    <File name="headers/mbed/TARGET_NUCLEO_F103RB/stm32f10x_bkp.h" path="mbed/TARGET_NUCLEO_F103RB/stm32f10x_bkp.h" type="1"/>
     <File name="headers/mbed/TARGET_NUCLEO_F103RB/TARGET_STM/TARGET_NUCLEO_F103RB" path="" type="2"/>
     <File name="headers/mbed/PortIn.h" path="mbed/PortIn.h" type="1"/>
     <File name="headers/mbed/TARGET_NUCLEO_F103RB/stm32f10x_crc.h" path="mbed/TARGET_NUCLEO_F103RB/stm32f10x_crc.h" type="1"/>
@@ -257,6 +260,7 @@
     <File name="headers/WIZnet_Library/WIZnetInterface/WIZnet/W5100.h" path="WIZnet_Library/WIZnetInterface/WIZnet/W5100.h" type="1"/>
     <File name="headers/mbed/SPISlave.h" path="mbed/SPISlave.h" type="1"/>
     <File name="headers/mbed/SPI.h" path="mbed/SPI.h" type="1"/>
+    <File name="headers/mbed/TARGET_NUCLEO_F103RB/stm32f1xx_hal_iwdg.c" path="mbed/TARGET_NUCLEO_F103RB/stm32f1xx_hal_iwdg.c" type="1"/>
     <File name="headers/mbed/Timeout.h" path="mbed/Timeout.h" type="1"/>
     <File name="headers/WIZnet_Library/WIZnetInterface/WIZnetInterface.h" path="WIZnet_Library/WIZnetInterface/WIZnetInterface.h" type="1"/>
     <File name="headers/mbed/RawSerial.h" path="mbed/RawSerial.h" type="1"/>

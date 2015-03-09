@@ -5,7 +5,8 @@
 */
 #include "mbed.h"
 #include "WIZnetInterface.h"
-#include "stm32f10x_iwdg.h"
+#include "stm32f1xx_hal_iwdg.h"
+#include "stm32f10x.h"
  
 #define ECHO_SERVER_PORT    9999
 #define BLDG_SERVER_IP      "192.168.0.21"
@@ -14,7 +15,9 @@ void check_stream(char* buf);
 void f_ethernet_init();
 void set_doors(int a,int b,int c, int d,int e,int f,int g,int h);
 void watchdog_init(void);
-void watchdog_kick(void);
+void watchdog_start(void);
+void watchdog_refresh(void);
+void watchdog_status(void);
 
 DigitalOut DOOR_1(PC_6);
 DigitalOut DOOR_2(PC_7);
@@ -30,6 +33,7 @@ SPI spi(PB_15,PB_14,PB_13); // mosi, miso, sclk
 WIZnetInterface eth(&spi, PB_12, PB_0); // spi, cs, reset
 Serial pc(PA_9,PA_10);
 DigitalOut led(PC_4);
+IWDG_HandleTypeDef hiwdg;	//Watchdog timer
 
 // for static IP setting
 const char * IP_Addr    = "192.168.1.120";
@@ -47,17 +51,18 @@ char data[512];
 int main()
 {
 	watchdog_init();
+	watchdog_start();
     set_doors(1,1,1,1,1,1,1,1);
     wait(2);
     set_doors(0,0,0,0,0,0,0,0);
-    //watchdog_kick();
+    watchdog_refresh();
     
     f_ethernet_init();    
     TCPSocketConnection bldg_client;
     bldg_client.set_blocking(true,1);
 
     while(attempt <=  max_attempts){
-    	watchdog_kick();
+    	watchdog_refresh();
         //TODO egress_button();
         pc.printf("\nAttempting to Connect to Server...\n\r");
         ret=bldg_client.connect(BLDG_SERVER_IP,ECHO_SERVER_PORT);
@@ -69,7 +74,7 @@ int main()
             attempt++;
         }
         while(bldg_client.is_connected()){
-        	watchdog_kick();     //Kick the dog
+        	watchdog_refresh();
             int n;
             //pc.printf("Sending Data\n\r");
             bldg_client.send("ID",2);
@@ -88,7 +93,7 @@ int main()
 
 void f_ethernet_init()
 {
-	//watchdog_kick();
+
     uint8_t mac[]={0x90,0xa2,0xDa,0x0d,0x42,0xe0};
     // mbed_mac_address((char *)mac); 
     pc.printf("\n\r####Starting Ethernet Server#### \n\r");
@@ -121,6 +126,7 @@ void f_ethernet_init()
     {
         pc.printf("Communication Failure  ... Restart devices ...\n\r"); 
     }
+    watchdog_refresh();
 }  
 
 void check_stream(char* buf)
@@ -150,22 +156,40 @@ void set_doors(int a,int b,int c, int d,int e,int f,int g,int h){
 }
 
 void watchdog_init(void){
-	/* Check if the system has resumed from IWDG reset */
-	if (RCC_GetFlagStatus(RCC_FLAG_IWDGRST) != RESET)
-	{
-		/* Clear reset flags */
-		RCC_ClearFlag();
-	}
-	IWDG_WriteAccessCmd(IWDG_WriteAccess_Enable);
-	IWDG_SetPrescaler(IWDG_Prescaler_256);	// RTC clock = LSI (40kHz) / 256 = 156.3Hz (0.1563kHz)
-	IWDG_SetReload(350);		// X / 156.3Hz = 10 seconds (1563) yeah...idk what's going on here
-	IWDG_WriteAccessCmd(IWDG_WriteAccess_Disable);
 
-	IWDG_Enable();
+	hiwdg.Instance = IWDG;
+	hiwdg.Init.Prescaler = IWDG_PRESCALER_256;
+	hiwdg.Init.Reload = 2050; //10 seconds (1350)
+	HAL_IWDG_Init(&hiwdg);
+
 }
 
-void watchdog_kick(void){
+void watchdog_start(void){
+	HAL_IWDG_Start(&hiwdg);
+}
 
-	IWDG_ReloadCounter();
+void watchdog_refresh(void){
+	HAL_IWDG_Refresh(&hiwdg);
+}
 
+void watchdog_status(void){
+	switch (HAL_IWDG_GetState(&hiwdg)){
+		case HAL_IWDG_STATE_RESET:
+			pc.printf("IWDG not yet initialized or disabled\r\n");
+			break;
+		case HAL_IWDG_STATE_READY:
+			pc.printf("IWDG initialized and ready for use\r\n");
+			break;
+		case HAL_IWDG_STATE_BUSY:
+			pc.printf("IWDG internal process is ongoing\r\n");
+			break;
+		case HAL_IWDG_STATE_TIMEOUT:
+			pc.printf("IWDG timeout state\r\n");
+			break;
+		case HAL_IWDG_STATE_ERROR:
+			pc.printf("IWDG error state\r\n");
+			break;
+		default:
+			pc.printf("Unknown state\n\r");
+	}
 }
