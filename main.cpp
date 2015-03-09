@@ -6,40 +6,36 @@
 #include "mbed.h"
 #include "WIZnetInterface.h"
 #include "stm32f1xx_hal_iwdg.h"
-#include "stm32f10x.h"
- 
+
+////Defines////
 #define ECHO_SERVER_PORT    9999
 #define BLDG_SERVER_IP      "192.168.0.21"
 
+////Prototypes////
 void check_stream(char* buf);
 void f_ethernet_init();
 void set_doors(int a,int b,int c, int d,int e,int f,int g,int h);
+void read_egress(void);
 void watchdog_init(void);
 void watchdog_start(void);
 void watchdog_refresh(void);
 void watchdog_status(void);
 
-DigitalOut DOOR_1(PC_6);
-DigitalOut DOOR_2(PC_7);
-DigitalOut DOOR_3(PC_8);
-DigitalOut DOOR_4(PC_9);
-DigitalOut DOOR_5(PA_8);
-DigitalOut DOOR_6(PA_15);
-DigitalOut DOOR_7(PC_10);
-DigitalOut DOOR_8(PC_11);
+////Pin Declarations////
+DigitalIn DOORS[8]={PC_6,PC_7,PC_8,PC_9,PA_8,PA_15,PC_10,PC_11};	//D0,D1,D2,D3,D4D5,D6,D7
+DigitalIn EGRESS[8]={PC_12,PD_2,PB_3,PB_4,PB_5,PB_6,PB_7,PB_8};		//D8,D9,D10,D11,D12,D13,D14,D15
 
+DigitalOut Debug_LED_0(PC_4);
+DigitalOut Debug_LED_1(PC_5);
 
-SPI spi(PB_15,PB_14,PB_13); // mosi, miso, sclk
-WIZnetInterface eth(&spi, PB_12, PB_0); // spi, cs, reset
-Serial pc(PA_9,PA_10);
-DigitalOut led(PC_4);
-IWDG_HandleTypeDef hiwdg;	//Watchdog timer
+////Constructors///
+SPI spi(PB_15,PB_14,PB_13); 			// timer interface -> mosi, miso, sclk
+WIZnetInterface eth(&spi, PB_12, PB_0); // WIZnet interface -> spi, cs, reset
+Serial pc(PA_9,PA_10);					// USART interface -> RX, TX
+IWDG_HandleTypeDef hiwdg;				//Watchdog timer
+Timer t[8];								//timer
 
-// for static IP setting
-const char * IP_Addr    = "192.168.1.120";
-const char * IP_Subnet  = "255.255.255.0";
-const char * IP_Gateway = "192.168.1.111";
-
+////Variables////
 char DOOR[8];
 int attempt=1;
 int max_attempts = 10;
@@ -50,45 +46,46 @@ char data[512];
  
 int main()
 {
-	watchdog_init();
-	watchdog_start();
-    set_doors(1,1,1,1,1,1,1,1);
-    wait(2);
-    set_doors(0,0,0,0,0,0,0,0);
-    watchdog_refresh();
-    
-    f_ethernet_init();    
-    TCPSocketConnection bldg_client;
-    bldg_client.set_blocking(true,1);
+	while (1){
+		watchdog_init();
+		watchdog_start();
+		set_doors(1,1,1,1,1,1,1,1);
+		wait(1);
+		set_doors(0,0,0,0,0,0,0,0);
+		watchdog_refresh();
 
-    while(attempt <=  max_attempts){
-    	watchdog_refresh();
-        //TODO egress_button();
-        pc.printf("\nAttempting to Connect to Server...\n\r");
-        ret=bldg_client.connect(BLDG_SERVER_IP,ECHO_SERVER_PORT);
-        if(!ret){
-            pc.printf("\nConnected to Building Server\n\r");
-            attempt = 0; //reset attempts
-        }else{
-            pc.printf("Connection Failed...This is attempt #%d of %d\n\r",attempt,max_attempts);
-            attempt++;
-        }
-        while(bldg_client.is_connected()){
-        	watchdog_refresh();
-            int n;
-            //pc.printf("Sending Data\n\r");
-            bldg_client.send("ID",2);
-            bldg_client.send(eth.getMACAddress(),strlen(eth.getMACAddress()));
-            //pc.printf("Receiving Data\n\r");
-            n = bldg_client.receive(data,512);
-            if(n < 0) break;
-            //pc.printf("Data: %s\r\n",data);
-            //TODO egress_button();
-            check_stream(data);
-            //pc.printf("Bldg: %s, Room: %s, Doors: %s\n\r", str_bldg, str_room, str_doors);
-            wait(1);
-        }
-    }
+		f_ethernet_init();
+		TCPSocketConnection bldg_client;
+		bldg_client.set_blocking(true,1);
+
+		while(attempt <=  max_attempts){
+			watchdog_refresh();
+			pc.printf("\nAttempting to Connect to Server...\n\r");
+			ret=bldg_client.connect(BLDG_SERVER_IP,ECHO_SERVER_PORT);
+			if(!ret){
+				pc.printf("\nConnected to Building Server\n\r");
+				attempt = 0; //reset attempts
+			}else{
+				pc.printf("Connection Failed...This is attempt #%d of %d\n\r",attempt,max_attempts);
+				attempt++;
+			}
+			while(bldg_client.is_connected()){
+				watchdog_refresh();
+				int n;
+				//pc.printf("Sending Data\n\r");
+				bldg_client.send("ID ",2);
+				bldg_client.send(eth.getMACAddress(),strlen(eth.getMACAddress()));
+				//pc.printf("Receiving Data\n\r");
+				n = bldg_client.receive(data,512);
+				if(n < 0) break;
+				//pc.printf("Data: %s\r\n",data);
+
+				check_stream(data);
+				//pc.printf("Bldg: %s, Room: %s, Doors: %s\n\r", str_bldg, str_room, str_doors);
+				read_egress();
+			}
+		}
+	}
 }
 
 void f_ethernet_init()
@@ -107,19 +104,12 @@ void f_ethernet_init()
     {
         pc.printf("Communication Failure  ... Restart devices ...\n\r");    
     }
-    pc.printf("Connecting to building server @ %s on port %d",BLDG_SERVER_IP, ECHO_SERVER_PORT );
-    wait(0.25);
-    pc.printf(".");
-    wait(0.25);
-    pc.printf(".");
-    wait(0.25);
-    pc.printf(".\n\r");
-    wait(0.25);
+    pc.printf("Connecting to building server @ %s on port %d...",BLDG_SERVER_IP, ECHO_SERVER_PORT );
     ret = eth.connect();
     if(!ret)
     {
         pc.printf("Connection Established!\n\n\r");
-        wait(1);
+        wait(.5);
         pc.printf("IP=%s\n\rMASK=%s\n\rGW=%s\n\r",eth.getIPAddress(), eth.getNetworkMask(), eth.getGateway());
     }    
     else
@@ -145,21 +135,26 @@ void check_stream(char* buf)
 
 void set_doors(int a,int b,int c, int d,int e,int f,int g,int h){
     
-    DOOR_1 = a;
-    DOOR_2 = b;    
-    DOOR_3 = c;
-    DOOR_4 = d;
-    DOOR_5 = e;
-    DOOR_6 = f;
-    DOOR_7 = g;
-    DOOR_8 = h;
+    DOOR[0] = a;
+    DOOR[1] = b;
+    DOOR[2] = c;
+    DOOR[3] = d;
+    DOOR[4] = e;
+    DOOR[5] = f;
+    DOOR[6] = g;
+    DOOR[7] = h;
+
+}
+
+void read_egress(void){
+
 }
 
 void watchdog_init(void){
 
 	hiwdg.Instance = IWDG;
 	hiwdg.Init.Prescaler = IWDG_PRESCALER_256;
-	hiwdg.Init.Reload = 2050; //10 seconds (1350)
+	hiwdg.Init.Reload = 1350; //10 seconds (1350)
 	HAL_IWDG_Init(&hiwdg);
 
 }
@@ -170,6 +165,7 @@ void watchdog_start(void){
 
 void watchdog_refresh(void){
 	HAL_IWDG_Refresh(&hiwdg);
+	Debug_LED_0 != Debug_LED_0;
 }
 
 void watchdog_status(void){
