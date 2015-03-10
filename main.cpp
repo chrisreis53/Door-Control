@@ -48,6 +48,7 @@ char data[512];
 int main()
 {
 	while (1){
+		attempt = 0;
 		watchdog_init();
 		watchdog_start();
 		watchdog_refresh();
@@ -67,6 +68,9 @@ int main()
 				pc.printf("Connection Failed...This is attempt #%d of %d\n\r",attempt,max_attempts);
 				attempt++;
 			}
+			read_egress();
+			egress_timer();
+			set_doors(door_status[0],door_status[1],door_status[2],door_status[3],door_status[4],door_status[5],door_status[6],door_status[7]);
 
 			while(bldg_client.is_connected()){
 				watchdog_refresh();
@@ -144,6 +148,12 @@ void set_doors(int a, int b, int c, int d, int e, int f, int g, int h){
     DOORS[5] = f;
     DOORS[6] = g;
     DOORS[7] = h;
+
+    for(int i = 0;i < 8;i++){
+    	if(DOORS[i]!=false){
+    		pc.printf("STATUS%d%d%d%d%d%d%d%d",DOORS[0],DOORS[1],DOORS[2],DOORS[3],DOORS[4],DOORS[5],DOORS[6],DOORS[7]);
+    	}
+    }
 
 }
 
