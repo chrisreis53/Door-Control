@@ -50,17 +50,14 @@ int main()
 	while (1){
 		watchdog_init();
 		watchdog_start();
-		set_doors(1,1,1,1,1,1,1,1);
-		wait(1);
-		set_doors(0,0,0,0,0,0,0,0);
 		watchdog_refresh();
-
 		f_ethernet_init();
 		TCPSocketConnection bldg_client;
 		bldg_client.set_blocking(true,1);
 
 		while(attempt <=  max_attempts){
 			watchdog_refresh();
+
 			pc.printf("\nAttempting to Connect to Server...\n\r");
 			ret=bldg_client.connect(BLDG_SERVER_IP,ECHO_SERVER_PORT);
 			if(!ret){
@@ -70,36 +67,31 @@ int main()
 				pc.printf("Connection Failed...This is attempt #%d of %d\n\r",attempt,max_attempts);
 				attempt++;
 			}
-			while(EGRESS[0].read()){
 
+			while(bldg_client.is_connected()){
+				watchdog_refresh();
+				int n;
+				//pc.printf("Sending Data\n\r");
+				bldg_client.send("ID ",2);
+				bldg_client.send(eth.getMACAddress(),strlen(eth.getMACAddress()));
+				//pc.printf("Receiving Data\n\r");
+				n = bldg_client.receive(data,512);
+				if(n < 0) break;
+				//pc.printf("Data: %s\r\n",data);
+
+				check_stream(data);
+				//pc.printf("Bldg: %s, Room: %s, Doors: %s\n\r", str_bldg, str_room, str_doors);
 				read_egress();
 				egress_timer();
 				set_doors(door_status[0],door_status[1],door_status[2],door_status[3],door_status[4],door_status[5],door_status[6],door_status[7]);
-				watchdog_refresh();
-
 			}
-//			while(bldg_client.is_connected()){
-//				watchdog_refresh();
-//				int n;
-//				//pc.printf("Sending Data\n\r");
-//				bldg_client.send("ID ",2);
-//				bldg_client.send(eth.getMACAddress(),strlen(eth.getMACAddress()));
-//				//pc.printf("Receiving Data\n\r");
-//				n = bldg_client.receive(data,512);
-//				if(n < 0) break;
-//				//pc.printf("Data: %s\r\n",data);
-//
-//				check_stream(data);
-//				//pc.printf("Bldg: %s, Room: %s, Doors: %s\n\r", str_bldg, str_room, str_doors);
-//				read_egress();
-//			}
 		}
 	}
 }
 
 void f_ethernet_init()
 {
-	watchdog_refresh()
+	watchdog_refresh();
     uint8_t mac[]={0x90,0xa2,0xDa,0x0d,0x42,0xe0};
     // mbed_mac_address((char *)mac); 
     pc.printf("\n\r####Starting Ethernet Server#### \n\r");
@@ -157,12 +149,12 @@ void set_doors(int a, int b, int c, int d, int e, int f, int g, int h){
 
 void read_egress(void){
 
-	for(int i = 0; i<sizeof(EGRESS);i++){
+	for(int i = 0; i<8;i++){
 
 		if(!door_status[i] && EGRESS[i].read()){
-			door_status[i] = EGRESS[i].read();
+			door_status[i] = true;
 			t[i].start();
-			pc.printf("Timer started for door: %d",(i+1));
+			pc.printf("Timer started for door: %d\r\n",(i+1));
 		}
 	}
 
@@ -170,12 +162,13 @@ void read_egress(void){
 
 void egress_timer(void){
 
-	for(int i = 0; i<sizeof(door_status);i++){
+	for(int i = 0; i<8;i++){
 
 		if (t[i].read() >= 5) {
 			t[i].stop();
+			t[i].reset();
 			door_status[i] = false;
-			pc.printf("Timer %d has reached 5 seconds",(i+1));
+			pc.printf("Timer %d has reached 5 seconds\r\n",(i+1));
 		}
 
 	}
