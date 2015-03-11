@@ -48,7 +48,7 @@ char data[512];
 int main()
 {
 	while (1){
-		attempt = 0;
+		attempt = 1;
 		watchdog_init();
 		watchdog_start();
 		watchdog_refresh();
@@ -151,7 +151,8 @@ void set_doors(int a, int b, int c, int d, int e, int f, int g, int h){
 
     for(int i = 0;i < 8;i++){
     	if(DOORS[i]!=false){
-    		pc.printf("STATUS%d%d%d%d%d%d%d%d",DOORS[0],DOORS[1],DOORS[2],DOORS[3],DOORS[4],DOORS[5],DOORS[6],DOORS[7]);
+    		pc.printf("STATUS:%s:%s%s%s%s%s%s%s%s",eth.getMACAddress(),DOORS[0],DOORS[1],DOORS[2],DOORS[3],DOORS[4],DOORS[5],DOORS[6],DOORS[7]);
+    		break;
     	}
     }
 
