@@ -1,6 +1,6 @@
 /*
 *
-*  Test program for W5500 mbed Library
+*  AFRL Door Control Program
 *
 */
 #include "mbed.h"
@@ -43,6 +43,7 @@ int max_attempts = 10;
 int ret;
 int watchTimeMs = 10000;
 char data[512];
+char status[8] = {0,0,0,0,0,0,0,0};
 
  
 int main()
@@ -149,9 +150,18 @@ void set_doors(int a, int b, int c, int d, int e, int f, int g, int h){
     DOORS[6] = g;
     DOORS[7] = h;
 
+    status[0] = a;
+    status[1] = b;
+    status[2] = c;
+    status[3] = d;
+    status[4] = e;
+    status[5] = f;
+    status[6] = g;
+    status[7] = h;
+
     for(int i = 0;i < 8;i++){
     	if(DOORS[i]!=false){
-    		pc.printf("STATUS:%s:%s%s%s%s%s%s%s%s",eth.getMACAddress(),DOORS[0],DOORS[1],DOORS[2],DOORS[3],DOORS[4],DOORS[5],DOORS[6],DOORS[7]);
+    		pc.printf("STATUS:%s:%d%d%d%d%d%d%d%d",eth.getMACAddress(),status[0],status[1],status[2],status[3],status[4],status[5],status[6],status[7]);
     		break;
     	}
     }
