@@ -6,10 +6,11 @@
 #include "mbed.h"
 #include "WIZnetInterface.h"
 #include "stm32f1xx_hal_iwdg.h"
+#include <string.h>
 
 ////Defines////
 #define ECHO_SERVER_PORT    9999
-#define BLDG_SERVER_IP      "192.168.0.21"
+#define BLDG_SERVER_IP      "192.168.1.104"
 
 ////Prototypes////
 void check_stream(char* buf);
@@ -17,6 +18,7 @@ void f_ethernet_init();
 void set_doors(int a,int b,int c, int d,int e,int f,int g,int h);
 void read_egress(void);
 void egress_timer(void);
+void button_check(void);
 void watchdog_init(void);
 void watchdog_start(void);
 void watchdog_refresh(void);
@@ -35,6 +37,7 @@ WIZnetInterface eth(&spi, PB_12, PB_0); // WIZnet interface -> spi, cs, reset
 Serial pc(PA_9,PA_10);					// USART interface -> RX, TX
 IWDG_HandleTypeDef hiwdg;				//Watchdog timer
 Timer t[8];								//timer
+Ticker flipper;							//Interrupt ticker
 
 ////Variables////
 bool door_status[8]={false,false,false,false,false,false,false,false};
@@ -43,28 +46,31 @@ int max_attempts = 10;
 int ret;
 int watchTimeMs = 10000;
 char data[512];
-char status[8] = {0,0,0,0,0,0,0,0};
+char buffer[512];
 
  
 int main()
 {
+
 	while (1){
 		attempt = 1;
-		watchdog_init();
-		watchdog_start();
-		watchdog_refresh();
+
+		//watchdog_init();
+		//watchdog_start();
+		//watchdog_refresh();
 		f_ethernet_init();
 		TCPSocketConnection bldg_client;
-		bldg_client.set_blocking(true,1);
+		bldg_client.set_blocking(true,50);
 
 		while(attempt <=  max_attempts){
-			watchdog_refresh();
+			//watchdog_refresh();
 
 			pc.printf("\nAttempting to Connect to Server...\n\r");
 			ret=bldg_client.connect(BLDG_SERVER_IP,ECHO_SERVER_PORT);
 			if(!ret){
 				pc.printf("\nConnected to Building Server\n\r");
-				attempt = 0; //reset attempts
+				attempt = 1; //reset attempts
+				flipper.attach(&button_check,0.5);
 			}else{
 				pc.printf("Connection Failed...This is attempt #%d of %d\n\r",attempt,max_attempts);
 				attempt++;
@@ -74,21 +80,23 @@ int main()
 			set_doors(door_status[0],door_status[1],door_status[2],door_status[3],door_status[4],door_status[5],door_status[6],door_status[7]);
 
 			while(bldg_client.is_connected()){
-				watchdog_refresh();
+				//watchdog_refresh();
 				int n;
 				//pc.printf("Sending Data\n\r");
-				bldg_client.send("ID ",2);
-				bldg_client.send(eth.getMACAddress(),strlen(eth.getMACAddress()));
-				//pc.printf("Receiving Data\n\r");
+				//bldg_client.send("ID ",2);
+				//sprintf(buffer,"ID-%s-%d%d%d%d%d%d%d%d\0",eth.getMACAddress(),status[0],status[1],status[2],status[3],status[4],status[5],status[6],status[7]);
+
+				//bldg_client.send(eth.getMACAddress(),strlen(eth.getMACAddress()));
+				pc.printf("Receiving Data\n\r");
 				n = bldg_client.receive(data,512);
 				if(n < 0) break;
-				//pc.printf("Data: %s\r\n",data);
+				pc.printf("Data: %s\r\n",data);
 
 				check_stream(data);
 				//pc.printf("Bldg: %s, Room: %s, Doors: %s\n\r", str_bldg, str_room, str_doors);
 				read_egress();
 				egress_timer();
-				set_doors(door_status[0],door_status[1],door_status[2],door_status[3],door_status[4],door_status[5],door_status[6],door_status[7]);
+				//set_doors(door_status[0],door_status[1],door_status[2],door_status[3],door_status[4],door_status[5],door_status[6],door_status[7]);
 			}
 		}
 	}
@@ -96,7 +104,7 @@ int main()
 
 void f_ethernet_init()
 {
-	watchdog_refresh();
+	//watchdog_refresh();
     uint8_t mac[]={0x90,0xa2,0xDa,0x0d,0x42,0xe0};
     // mbed_mac_address((char *)mac); 
     pc.printf("\n\r####Starting Ethernet Server#### \n\r");
@@ -122,7 +130,7 @@ void f_ethernet_init()
     {
         pc.printf("Communication Failure  ... Restart devices ...\n\r"); 
     }
-    watchdog_refresh();
+    //watchdog_refresh();
 }  
 
 void check_stream(char* buf)
@@ -131,7 +139,6 @@ void check_stream(char* buf)
     for(int i = 0; i<strlen(buf); i++) {
 
         if(buf[i] == 'D' && buf[i+1] == 'O' && buf[i+2] == 'O' && buf[i+3] == 'R' && buf[i+4] == ':') {
-            pc.printf("%d,%d,%d,%d,%d,%d,%d,%d",buf[i+5],buf[i+6],buf[i+7],buf[i+8],buf[i+9],buf[i+10],buf[i+11],buf[i+12]);
             set_doors(buf[i+5]-'0',buf[i+6]-'0',buf[i+7]-'0',buf[i+8]-'0',buf[i+9]-'0',buf[i+10]-'0',buf[i+11]-'0',buf[i+12]-'0');
             
         }
@@ -150,18 +157,18 @@ void set_doors(int a, int b, int c, int d, int e, int f, int g, int h){
     DOORS[6] = g;
     DOORS[7] = h;
 
-    status[0] = a;
-    status[1] = b;
-    status[2] = c;
-    status[3] = d;
-    status[4] = e;
-    status[5] = f;
-    status[6] = g;
-    status[7] = h;
+    door_status[0] = a;
+    door_status[1] = b;
+    door_status[2] = c;
+    door_status[3] = d;
+    door_status[4] = e;
+    door_status[5] = f;
+    door_status[6] = g;
+    door_status[7] = h;
 
     for(int i = 0;i < 8;i++){
     	if(DOORS[i]!=false){
-    		pc.printf("STATUS:%s:%d%d%d%d%d%d%d%d",eth.getMACAddress(),status[0],status[1],status[2],status[3],status[4],status[5],status[6],status[7]);
+    		pc.printf("STATUS:%s:%d%d%d%d%d%d%d%d",eth.getMACAddress(),door_status[0],door_status[1],door_status[2],door_status[3],door_status[4],door_status[5],door_status[6],door_status[7]);
     		break;
     	}
     }
@@ -194,6 +201,12 @@ void egress_timer(void){
 
 	}
 
+}
+
+void button_check(void){
+	read_egress();
+	egress_timer();
+	set_doors(door_status[0],door_status[1],door_status[2],door_status[3],door_status[4],door_status[5],door_status[6],door_status[7]);
 }
 
 void watchdog_init(void){
