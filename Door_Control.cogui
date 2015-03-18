@@ -11,13 +11,18 @@
 <folder appearance="1" expanded="2">
 <presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">
 <part id="0"/>
+<part id="1"/>
 </presentation>
 </folder>
 </info>
 </editorArea>
 <editor activePart="true" focus="true" id="org.eclipse.cdt.ui.editor.CEditor" name="main.cpp" partName="main.cpp" path="C:/Users/Christopher/Documents/GitHub/Door-Control/main.cpp" title="main.cpp" tooltip="C:/Users/Christopher/Documents/GitHub/Door-Control/main.cpp" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/Door_Control/sources/main.cpp"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="4539" selectionTopPixel="2428"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="242" selectionTopPixel="0"/>
+</editor>
+<editor id="org.eclipse.cdt.ui.editor.CEditor" name="string.h" partName="string.h" title="string.h" tooltip="C:\Program Files (x86)\GNU Tools ARM Embedded\4.9 2014q4\arm-none-eabi\include\string.h" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.cdt.ui.ExternalEditorInputFactory" path="C:\Program Files (x86)\GNU Tools ARM Embedded\4.9 2014q4\arm-none-eabi\include\string.h" project="Door_Control"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="1" selectionTopPixel="0"/>
 </editor>
 </editors>
 <views>
@@ -29,7 +34,7 @@
 <element path="/Door_Control/sources"/>
 </expanded>
 <selection>
-<element path="/Door_Control/sources/main.cpp"/>
+<element path="/Door_Control/sources"/>
 </selection>
 </viewState>
 </view>
@@ -46,7 +51,7 @@
 <viewState/>
 </view>
 </views>
-<perspectives activePart="org.eclipse.cdt.ui.editor.CEditor" activePerspective="org.coocox.builder.perspective.CoBuilder">
+<perspectives activePart="org.coocox.builder.ui.views.ProjectView" activePerspective="org.coocox.builder.perspective.CoBuilder">
 <perspective editorAreaTrimState="2" editorAreaVisible="1" fixed="0" version="0.016">
 <descriptor class="org.coocox.builder.ui.PerspectiveCoBuilder" id="org.coocox.builder.perspective.CoBuilder" label="CooCox CoBuilder"/>
 <alwaysOnActionSet id="org.coocox.component.ui.actionSet"/>
@@ -99,7 +104,7 @@
 </folder>
 </info>
 <info part="org.coocox.builder.ui.exampleView" ratio="0.14173722" ratioLeft="452" ratioRight="2737" relationship="2" relative="org.eclipse.ui.internal.ViewStack@f239e2"/>
-<info folder="true" part="org.eclipse.ui.internal.ViewStack@1fb32a9" ratio="0.6843453" ratioLeft="1871" ratioRight="863" relationship="2" relative="org.coocox.builder.ui.exampleView">
+<info folder="true" part="org.eclipse.ui.internal.ViewStack@1fb32a9" ratio="0.5833943" ratioLeft="1595" ratioRight="1139" relationship="2" relative="org.coocox.builder.ui.exampleView">
 <folder activePageID="org.eclipse.ui.views.ContentOutline" appearance="2" expanded="2">
 <page content="org.coocox.component.ui.Help" label="Help"/>
 <page content="org.eclipse.ui.views.ContentOutline" label="Outline"/>
@@ -140,6 +145,7 @@
 <org.coocox.welcome.ui.WelcomePage/>
 </editor>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/Door_Control/sources/main.cpp"/>
+<editor factoryID="org.eclipse.cdt.ui.ExternalEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="C:\Program Files (x86)\GNU Tools ARM Embedded\4.9 2014q4\arm-none-eabi\include\string.h" project="Door_Control"/>
 </editors>
 <item historyLabel="welcome" index="0"/>
 <item historyLabel="main.cpp" index="1">
@@ -169,8 +175,77 @@
 <item historyLabel="main.cpp" index="1">
 <position info="not_deleted" x="4627" y="0"/>
 </item>
-<item active="true" historyLabel="main.cpp" index="1">
+<item historyLabel="main.cpp" index="1">
 <position info="not_deleted" x="4611" y="0"/>
+</item>
+<item historyLabel="main.cpp" index="1">
+<position info="not_deleted" x="1472" y="0"/>
+</item>
+<item historyLabel="main.cpp" index="1">
+<position info="not_deleted" x="4460" y="0"/>
+</item>
+<item historyLabel="main.cpp" index="1">
+<position/>
+</item>
+<item historyLabel="main.cpp" index="1">
+<position info="not_deleted" x="2575" y="0"/>
+</item>
+<item historyLabel="main.cpp" index="1">
+<position info="not_deleted" x="2514" y="0"/>
+</item>
+<item historyLabel="main.cpp" index="1">
+<position info="not_deleted" x="145" y="0"/>
+</item>
+<item historyLabel="main.cpp" index="1">
+<position info="not_deleted" x="1459" y="0"/>
+</item>
+<item historyLabel="main.cpp" index="1">
+<position info="not_deleted" x="2655" y="38"/>
+</item>
+<item historyLabel="main.cpp" index="1">
+<position info="not_deleted" x="1474" y="2"/>
+</item>
+<item historyLabel="main.cpp" index="1">
+<position info="not_deleted" x="137" y="0"/>
+</item>
+<item historyLabel="string.h" index="2">
+<position info="not_deleted" x="1" y="0"/>
+</item>
+<item historyLabel="main.cpp" index="1">
+<position info="not_deleted" x="137" y="0"/>
+</item>
+<item historyLabel="main.cpp" index="1">
+<position/>
+</item>
+<item historyLabel="main.cpp" index="1">
+<position info="not_deleted" x="463" y="0"/>
+</item>
+<item historyLabel="main.cpp" index="1">
+<position info="not_deleted" x="6317" y="0"/>
+</item>
+<item historyLabel="main.cpp" index="1">
+<position info="not_deleted" x="1472" y="0"/>
+</item>
+<item historyLabel="main.cpp" index="1">
+<position info="not_deleted" x="2434" y="0"/>
+</item>
+<item historyLabel="main.cpp" index="1">
+<position info="not_deleted" x="6321" y="3"/>
+</item>
+<item historyLabel="main.cpp" index="1">
+<position info="not_deleted" x="5598" y="0"/>
+</item>
+<item historyLabel="main.cpp" index="1">
+<position info="not_deleted" x="5645" y="0"/>
+</item>
+<item historyLabel="main.cpp" index="1">
+<position info="not_deleted" x="5646" y="0"/>
+</item>
+<item historyLabel="main.cpp" index="1">
+<position info="not_deleted" x="3133" y="0"/>
+</item>
+<item active="true" historyLabel="main.cpp" index="1">
+<position info="not_deleted" x="5602" y="48"/>
 </item>
 </navigationHistory>
 <input factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/" type="8"/>
@@ -179,13 +254,11 @@
 <actionBarAdvisor/>
 </window>
 <mruList>
+<file factoryID="org.eclipse.cdt.ui.ExternalEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="string.h" tooltip="C:\Program Files (x86)\GNU Tools ARM Embedded\4.9 2014q4\arm-none-eabi\include\string.h">
+<persistable path="C:\Program Files (x86)\GNU Tools ARM Embedded\4.9 2014q4\arm-none-eabi\include\string.h" project="Door_Control"/>
+</file>
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="main.cpp" tooltip="Door_Control/sources/main.cpp">
 <persistable path="/Door_Control/sources/main.cpp"/>
-</file>
-<file factoryID="org.coocox.builder.ui.persistent.PersistentElementFactory" id="org.coocox.welcome.ui.WelcomePage" name="" tooltip="">
-<persistable>
-<org.coocox.welcome.ui.WelcomePage/>
-</persistable>
 </file>
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="main.cpp" tooltip="Embedded_web_DoorControl/sources/main.cpp">
 <persistable path="/Embedded_web_DoorControl/sources/main.cpp"/>
@@ -205,9 +278,6 @@
 <file factoryID="org.eclipse.cdt.ui.ExternalEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="strings.h" tooltip="C:\Program Files (x86)\GNU Tools ARM Embedded\4.9 2014q4\arm-none-eabi\include\strings.h">
 <persistable path="C:\Program Files (x86)\GNU Tools ARM Embedded\4.9 2014q4\arm-none-eabi\include\strings.h" project="Embedded_web_wiznet"/>
 </file>
-<file factoryID="org.eclipse.cdt.ui.ExternalEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="string.h" tooltip="C:\Program Files (x86)\GNU Tools ARM Embedded\4.9 2014q4\arm-none-eabi\include\string.h">
-<persistable path="C:\Program Files (x86)\GNU Tools ARM Embedded\4.9 2014q4\arm-none-eabi\include\string.h" project="Embedded_web_wiznet"/>
-</file>
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="gpio_object.h" tooltip="Embedded_web/headers/mbed/TARGET_NUCLEO_F401RE/TARGET_STM/TARGET_NUCLEO_F401RE/gpio_object.h">
 <persistable path="/Embedded_web/headers/mbed/TARGET_NUCLEO_F401RE/TARGET_STM/TARGET_NUCLEO_F401RE/gpio_object.h"/>
 </file>
@@ -223,6 +293,9 @@
 <file factoryID="org.coocox.component.ui.editors.repository.RepositoryElementFactory" id="org.coocox.builder.ui.editors.repository.RepositoryBrowser" name="Repository" tooltip="Repository">
 <persistable>&#x0A;<subPage/>
 </persistable>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="platform.h" tooltip="Embedded_web_DoorControl/headers/mbed/platform.h">
+<persistable path="/Embedded_web_DoorControl/headers/mbed/platform.h"/>
 </file>
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="platform.h" tooltip="Embedded_web_DoorControl/headers/mbed/platform.h">
 <persistable path="/Embedded_web_DoorControl/headers/mbed/platform.h"/>

@@ -120,6 +120,7 @@ void f_ethernet_init()
     }
     pc.printf("Connecting to building server @ %s on port %d...",BLDG_SERVER_IP, ECHO_SERVER_PORT );
     ret = eth.connect();
+    watchdog_refresh();
     if(!ret)
     {
         pc.printf("Connection Established!\n\n\r");
@@ -223,7 +224,7 @@ void watchdog_init(void){
 
 	hiwdg.Instance = IWDG;
 	hiwdg.Init.Prescaler = IWDG_PRESCALER_256;
-	hiwdg.Init.Reload = 1350; //10 seconds (1350)
+	hiwdg.Init.Reload = 2050; //10 seconds (1350)
 	HAL_IWDG_Init(&hiwdg);
 
 }

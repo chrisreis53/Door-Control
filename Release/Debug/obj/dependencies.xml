@@ -68,6 +68,11 @@
       <source file="..\..\..\mbed\analogout_api.h" lastModified="14c03f7b268">
          <include file="..\..\..\mbed\TARGET_NUCLEO_F103RB\TARGET_STM\TARGET_NUCLEO_F103RB\device.h"/>
       </source>
+      <source file="..\..\..\main.cpp" lastModified="14c2ddc5906">
+         <include file="..\..\..\mbed\mbed.h"/>
+         <include file="..\..\..\WIZnet_Library\WIZnetInterface\WIZnetInterface.h"/>
+         <include file="..\..\..\mbed\TARGET_NUCLEO_F103RB\stm32f1xx_hal_iwdg.h"/>
+      </source>
       <source file="..\..\..\mbed\FileSystemLike.h" lastModified="14c03f7b1d6">
          <include file="..\..\..\mbed\platform.h"/>
          <include file="..\..\..\mbed\FileBase.h"/>
