@@ -10,7 +10,7 @@
 
 ////Defines////
 #define ECHO_SERVER_PORT    9999
-#define BLDG_SERVER_IP      "192.168.1.104"
+#define BLDG_SERVER_IP      "10.10.1.7"
 
 ////Prototypes////
 void check_stream(char* buf);
@@ -55,12 +55,13 @@ int main()
 
 	while (1){
 		attempt = 1;
-
+		set_doors(1,0,0,0,0,0,0,0);
+		wait(15);
 		watchdog_init();
 		watchdog_start();
 		watchdog_refresh();
 		f_ethernet_init();
-		bldg_client.set_blocking(true,50);
+		bldg_client.set_blocking(false,50);
 
 		while(attempt <=  max_attempts){
 			watchdog_refresh();
