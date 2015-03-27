@@ -30,7 +30,7 @@ int UDPSocket::init(void)
     if (_sock_fd < 0) {
         _sock_fd = eth->new_socket();
     }
-    if (eth->setProtocol(_sock_fd, UDP) == false) return -1; 
+    if (eth->setProtocol(_sock_fd, UDP) == false) return -1;
     return 0;
 }
 
@@ -78,9 +78,16 @@ int UDPSocket::receiveFrom(Endpoint &remote, char *buffer, int length)
     }
     eth->recv(_sock_fd, (char*)info, sizeof(info));
     readEndpoint(remote, info);
-    int udp_size = info[6]<<8|info[7]; 
+    int udp_size = info[6]<<8|info[7];
     //TEST_ASSERT(udp_size <= (size-sizeof(info)));
     if (udp_size > (size-sizeof(info))) {
+        return -1;
+    }
+
+    /* Perform Length check here to prevent buffer overrun */
+    /* fixed by Sean Newton (https://developer.mbed.org/users/SeanNewton/) */
+    if (udp_size > length) {
+        //printf("udp_size: %d\n",udp_size);
         return -1;
     }
     return eth->recv(_sock_fd, buffer, udp_size);

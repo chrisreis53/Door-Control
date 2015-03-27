@@ -18,7 +18,7 @@
  
 #include "Socket.h"
 
-Socket::Socket() : _sock_fd(-1),_blocking(true), _timeout(1) {
+Socket::Socket() : _sock_fd(-1),_blocking(true), _timeout(1500) {
     eth = WIZnet_Chip::getInstance();
     if (eth == NULL) {
         error("Socket constructor error: no W5500 instance available!\r\n");

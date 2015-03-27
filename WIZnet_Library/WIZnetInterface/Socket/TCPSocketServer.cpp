@@ -21,13 +21,17 @@
 TCPSocketServer::TCPSocketServer() {}
 
 // Server initialization
-int TCPSocketServer::bind(int port) {
+int TCPSocketServer::bind(int port)
+{
+
     if (_sock_fd < 0) {
         _sock_fd = eth->new_socket();
         if (_sock_fd < 0) {
             return -1;
         }
     }
+    // set the listen_port for next connection.
+    listen_port = port;
     // set TCP protocol
     eth->setProtocol(_sock_fd, TCP);
     // set local port
@@ -37,7 +41,8 @@ int TCPSocketServer::bind(int port) {
     return 0;
 }
 
-int TCPSocketServer::listen(int backlog) {
+int TCPSocketServer::listen(int backlog)
+{
     if (_sock_fd < 0) {
         return -1;
     }
@@ -49,7 +54,8 @@ int TCPSocketServer::listen(int backlog) {
 }
 
 
-int TCPSocketServer::accept(TCPSocketConnection& connection) {
+int TCPSocketServer::accept(TCPSocketConnection& connection)
+{
     if (_sock_fd < 0) {
         return -1;
     }
@@ -68,8 +74,21 @@ int TCPSocketServer::accept(TCPSocketConnection& connection) {
     char host[16];
     snprintf(host, sizeof(host), "%d.%d.%d.%d", (ip>>24)&0xff, (ip>>16)&0xff, (ip>>8)&0xff, ip&0xff);
     uint16_t port = eth->sreg<uint16_t>(_sock_fd, Sn_DPORT);
+    // change this server socket to connection socket.
     connection._sock_fd = _sock_fd;
     connection.set_address(host, port);
+
+    // and then, for the next connection, server socket should be assigned new one.
+    _sock_fd = -1; // want to assign new available _sock_fd.
+    if(bind(listen_port) < 0) {
+        error("No more socket for listening");
+    } else {
+        //return -1;
+        if(listen(1) < 0) {
+            error("No more socket for listening");
+        }
+    }
+
     return 0;
 }
 

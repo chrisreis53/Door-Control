@@ -22,9 +22,9 @@
 #include "mbed.h"
 #include "mbed_debug.h"
 
-//#define USE_W5500
+#define USE_W5500
 //#define USE_W5200
-#define USE_W5100
+//#define USE_W5100
 
 #if defined(USE_W5500)
 #include "W5500.h"

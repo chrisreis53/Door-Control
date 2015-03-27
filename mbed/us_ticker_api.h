@@ -22,7 +22,7 @@
 extern "C" {
 #endif
 
-typedef uint64_t timestamp_t;
+typedef uint32_t timestamp_t;
 
 uint32_t us_ticker_read(void);
 
@@ -43,6 +43,7 @@ void us_ticker_irq_handler(void);
 
 void us_ticker_insert_event(ticker_event_t *obj, timestamp_t timestamp, uint32_t id);
 void us_ticker_remove_event(ticker_event_t *obj);
+int us_ticker_get_next_timestamp(timestamp_t *timestamp);
 
 #ifdef __cplusplus
 }
