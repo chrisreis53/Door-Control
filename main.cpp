@@ -63,7 +63,7 @@ int main()
 	//DOOR:11111111
 	while (1){
 		attempt = 1;
-		//set_doors(1,0,0,0,0,0,0,0);
+
 		watchdog_init();
 		watchdog_start();
 		watchdog_refresh();
@@ -84,12 +84,15 @@ int main()
 					int n;
 					button_check();
 					n = bldg_client.receive(data,512);
-					pc.printf("%s\n\r",data);
-					check_stream(data);
-					send_data();
+					if (n>0) {
+						pc.printf("%s sent %s\n\r",bldg_client.get_address(),data);
+						check_stream(data);
+						send_data();
+					}
+
 				}
 			}else{
-				pc.printf("No Connection");
+				pc.printf("No Connection\n\r");
 			}
 		}
 
@@ -172,7 +175,7 @@ void set_doors(int a, int b, int c, int d, int e, int f, int g, int h){
 
     for(int i = 0;i < 8;i++){
     	if(DOORS[i]!=false){
-    		sprintf(buffer,"STATUS:%s:%d%d%d%d%d%d%d%d\n\r",eth.getMACAddress(),door_status[0],door_status[1],door_status[2],door_status[3],door_status[4],door_status[5],door_status[6],door_status[7]);
+    		sprintf(buffer,"STATUS:%d%d%d%d%d%d%d%d\n\r",door_status[0],door_status[1],door_status[2],door_status[3],door_status[4],door_status[5],door_status[6],door_status[7]);
     		pc.printf(buffer);
     		bldg_client.send(buffer,strlen(buffer));
     		break;
