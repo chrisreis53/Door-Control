@@ -10,7 +10,8 @@
 
 ////Defines////
 #define ECHO_SERVER_PORT    9999
-#define BLDG_SERVER_IP      "10.10.1.7"
+//#define BLDG_SERVER_IP      "10.10.1.7"
+#define BLDG_SERVER_IP      "192.168.1.103"
 
 ////Prototypes////
 void check_stream(char* buf);
@@ -19,6 +20,8 @@ void set_doors(int a,int b,int c, int d,int e,int f,int g,int h);
 void read_egress(void);
 void egress_timer(void);
 void button_check(void);
+void read_alarm(void);
+void send_data(void);
 void watchdog_init(void);
 void watchdog_start(void);
 void watchdog_refresh(void);
@@ -27,6 +30,7 @@ void watchdog_status(void);
 ////Pin Declarations////
 DigitalOut DOORS[8]={PC_6,PC_7,PC_8,PC_9,PA_8,PA_15,PC_10,PC_11};	//D0,D1,D2,D3,D4D5,D6,D7
 DigitalIn EGRESS[8]={PC_12,PD_2,PB_3,PB_4,PB_5,PB_6,PB_7,PB_8};		//D8,D9,D10,D11,D12,D13,D14,D15
+DigitalIn ALARM[4]={PA_7,PA_6,PA_5,PA_4};
 
 DigitalOut Debug_LED_0(PC_4);
 DigitalOut Debug_LED_1(PC_5);
@@ -38,68 +42,57 @@ Serial pc(PA_9,PA_10);					// USART interface -> RX, TX
 IWDG_HandleTypeDef hiwdg;				//Watchdog timer
 Timer t[8];								//timer
 Ticker flipper;							//Interrupt ticker
+TCPSocketServer door_server;			//TCP Socket Server
 TCPSocketConnection bldg_client;		//TCP Socket Connection
 
 ////Variables////
 bool door_status[8]={false,false,false,false,false,false,false,false};
+bool door_egress[8]={false,false,false,false,false,false,false,false};
+bool alarm_status[4]={false,false,false,false};
+bool connection_status = false;
 int attempt=1;
 int max_attempts = 10;
 int ret;
 int watchTimeMs = 10000;
-char data[512];
 char buffer[512];
+//char data[512];
 
  
 int main()
 {
-
+	//DOOR:11111111
 	while (1){
 		attempt = 1;
-		set_doors(1,0,0,0,0,0,0,0);
-		wait(15);
+		//set_doors(1,0,0,0,0,0,0,0);
 		watchdog_init();
 		watchdog_start();
 		watchdog_refresh();
 		f_ethernet_init();
+		door_server.bind(ECHO_SERVER_PORT);
+		door_server.listen();
 		bldg_client.set_blocking(false,50);
-
-		while(attempt <=  max_attempts){
+		door_server.set_blocking(false,50);
+		while(1){
 			watchdog_refresh();
-
-			pc.printf("\nAttempting to Connect to Server...\n\r");
-			ret=bldg_client.connect(BLDG_SERVER_IP,ECHO_SERVER_PORT);
-			if(!ret){
-				pc.printf("\nConnected to Building Server\n\r");
-				attempt = 1; //reset attempts
-				flipper.attach(&button_check,0.5 );
+			button_check();
+			connection_status = door_server.accept(bldg_client);
+			if(!connection_status){
+				pc.printf("Received Client Connection\n\r");
+				while(bldg_client.is_connected()){
+					watchdog_refresh();
+					char data[512];
+					int n;
+					button_check();
+					n = bldg_client.receive(data,512);
+					pc.printf("%s\n\r",data);
+					check_stream(data);
+					send_data();
+				}
 			}else{
-				pc.printf("Connection Failed...This is attempt #%d of %d\n\r",attempt,max_attempts);
-				attempt++;
-			}
-			read_egress();
-			egress_timer();
-			set_doors(door_status[0],door_status[1],door_status[2],door_status[3],door_status[4],door_status[5],door_status[6],door_status[7]);
-
-			while(bldg_client.is_connected()){
-				watchdog_refresh();
-				int n;
-				//pc.printf("Sending Data\n\r");
-				//bldg_client.send("ID ",2);
-				//sprintf(buffer,"ID-%s-%d%d%d%d%d%d%d%d\0",eth.getMACAddress(),status[0],status[1],status[2],status[3],status[4],status[5],status[6],status[7]);
-
-				//bldg_client.send(eth.getMACAddress(),strlen(eth.getMACAddress()));
-				pc.printf("Receiving Data\n\r");
-				n = bldg_client.receive(data,512);
-				if(n < 0) break;
-				pc.printf("Data: %s\r\n",data);
-
-				check_stream(data);
-				//pc.printf("Bldg: %s, Room: %s, Doors: %s\n\r", str_bldg, str_room, str_doors);
-				read_egress();
-				egress_timer();
-				//set_doors(door_status[0],door_status[1],door_status[2],door_status[3],door_status[4],door_status[5],door_status[6],door_status[7]);
+				pc.printf("No Connection");
 			}
 		}
+
 	}
 }
 
@@ -119,7 +112,7 @@ void f_ethernet_init()
     {
         pc.printf("Communication Failure  ... Restart devices ...\n\r");    
     }
-    pc.printf("Connecting to building server @ %s on port %d...",BLDG_SERVER_IP, ECHO_SERVER_PORT );
+    pc.printf("Connecting to building server @ %s on port %d...\n\r",BLDG_SERVER_IP, ECHO_SERVER_PORT );
     ret = eth.connect();
     watchdog_refresh();
     if(!ret)
@@ -158,14 +151,15 @@ void check_stream(char* buf)
 
 void set_doors(int a, int b, int c, int d, int e, int f, int g, int h){
     
-    DOORS[0] = a;
-    DOORS[1] = b;
-    DOORS[2] = c;
-    DOORS[3] = d;
-    DOORS[4] = e;
-    DOORS[5] = f;
-    DOORS[6] = g;
-    DOORS[7] = h;
+    for (int var = 0; var < 8; ++var) {
+    	if(door_status[var] == true && door_egress[var] == false){
+    		DOORS[var] = true;
+    	}else if (door_status[var] == true && door_egress[var] == true) {
+			DOORS[var] = false;
+		}else{
+			DOORS[var] = false;
+		}
+	}
 
     door_status[0] = a;
     door_status[1] = b;
@@ -178,7 +172,7 @@ void set_doors(int a, int b, int c, int d, int e, int f, int g, int h){
 
     for(int i = 0;i < 8;i++){
     	if(DOORS[i]!=false){
-    		sprintf(buffer,"STATUS:%s:%d%d%d%d%d%d%d%d",eth.getMACAddress(),door_status[0],door_status[1],door_status[2],door_status[3],door_status[4],door_status[5],door_status[6],door_status[7]);
+    		sprintf(buffer,"STATUS:%s:%d%d%d%d%d%d%d%d\n\r",eth.getMACAddress(),door_status[0],door_status[1],door_status[2],door_status[3],door_status[4],door_status[5],door_status[6],door_status[7]);
     		pc.printf(buffer);
     		bldg_client.send(buffer,strlen(buffer));
     		break;
@@ -191,8 +185,8 @@ void read_egress(void){
 
 	for(int i = 0; i<8;i++){
 
-		if(!door_status[i] && EGRESS[i].read()){
-			door_status[i] = false;
+		if(door_status[i] && EGRESS[i].read()){
+			door_egress[i] = true;
 			t[i].start();
 			pc.printf("Timer started for door: %d\r\n",(i+1));
 		}
@@ -207,7 +201,7 @@ void egress_timer(void){
 		if (t[i].read() >= 5) {
 			t[i].stop();
 			t[i].reset();
-			door_status[i] = true;
+			door_egress[i] = false;
 			pc.printf("Timer %d has reached 5 seconds\r\n",(i+1));
 		}
 
@@ -219,6 +213,27 @@ void button_check(void){
 	read_egress();
 	egress_timer();
 	set_doors(door_status[0],door_status[1],door_status[2],door_status[3],door_status[4],door_status[5],door_status[6],door_status[7]);
+}
+
+void read_alarm(void){
+
+	for(int i = 0;i<4;i++){
+		if(ALARM[i].read()==1){
+			alarm_status[i]=true;
+		}
+	}
+
+}
+
+void send_data(void){
+
+	char buf[64];
+	sprintf(buf,"ALARM:%i%i%i%i\n\r\0",alarm_status[0],alarm_status[1],alarm_status[2],alarm_status[3]);
+	bldg_client.send(buf,strlen(buf));
+	char buf_2[64];
+	sprintf(buf_2,"DOOR:%i%i%i%i%i%i%i%i\n\r\0",door_status[0],door_status[1],door_status[2],door_status[3],door_status[4],door_status[5],door_status[6],door_status[7]);
+	bldg_client.send(buf_2,strlen(buf_2));
+
 }
 
 void watchdog_init(void){

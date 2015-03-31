@@ -18,7 +18,7 @@
 </editorArea>
 <editor activePart="true" focus="true" id="org.eclipse.cdt.ui.editor.CEditor" name="main.cpp" partName="main.cpp" path="C:/Users/Christopher/Documents/GitHub/Door-Control/main.cpp" title="main.cpp" tooltip="C:/Users/Christopher/Documents/GitHub/Door-Control/main.cpp" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/Door_Control/sources/main.cpp"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="6582" selectionTopPixel="2867"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="1683" selectionTopPixel="1542"/>
 </editor>
 <editor id="org.eclipse.cdt.ui.editor.CEditor" name="string.h" partName="string.h" title="string.h" tooltip="C:\Program Files (x86)\GNU Tools ARM Embedded\4.9 2014q4\arm-none-eabi\include\string.h" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.cdt.ui.ExternalEditorInputFactory" path="C:\Program Files (x86)\GNU Tools ARM Embedded\4.9 2014q4\arm-none-eabi\include\string.h" project="Door_Control"/>
@@ -244,8 +244,14 @@
 <item historyLabel="main.cpp" index="1">
 <position info="not_deleted" x="3133" y="0"/>
 </item>
-<item active="true" historyLabel="main.cpp" index="1">
+<item historyLabel="main.cpp" index="1">
 <position info="not_deleted" x="5602" y="48"/>
+</item>
+<item historyLabel="main.cpp" index="1">
+<position info="not_deleted" x="1548" y="0"/>
+</item>
+<item active="true" historyLabel="main.cpp" index="1">
+<position info="not_deleted" x="1561" y="0"/>
 </item>
 </navigationHistory>
 <input factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/" type="8"/>
