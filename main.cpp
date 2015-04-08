@@ -32,8 +32,8 @@ DigitalOut DOORS[8]={PC_6,PC_7,PC_8,PC_9,PA_8,PA_15,PC_10,PC_11};	//D0,D1,D2,D3,
 DigitalIn EGRESS[8]={PC_12,PD_2,PB_3,PB_4,PB_5,PB_6,PB_7,PB_8};		//D8,D9,D10,D11,D12,D13,D14,D15
 DigitalIn ALARM[4]={PA_7,PA_6,PA_5,PA_4};
 
-DigitalOut Debug_LED_0(PC_4);
-DigitalOut Debug_LED_1(PC_5);
+DigitalOut Debug_LED_0(PC_4,1);
+DigitalOut Debug_LED_1(PC_5,1);
 
 ////Constructors///
 SPI spi(PB_15,PB_14,PB_13); 			// timer interface -> mosi, miso, sclk
@@ -41,6 +41,7 @@ WIZnetInterface eth(&spi, PB_12, PB_0); // WIZnet interface -> spi, cs, reset
 Serial pc(PA_9,PA_10);					// USART interface -> RX, TX
 IWDG_HandleTypeDef hiwdg;				//Watchdog timer
 Timer t[8];								//timer
+Timer data_timer;						//data timer
 Ticker flipper;							//Interrupt ticker
 TCPSocketServer door_server;			//TCP Socket Server
 TCPSocketConnection bldg_client;		//TCP Socket Connection
@@ -50,6 +51,7 @@ bool door_status[8]={false,false,false,false,false,false,false,false};
 bool door_egress[8]={false,false,false,false,false,false,false,false};
 bool alarm_status[4]={false,false,false,false};
 bool connection_status = false;
+bool alarm_signal = false;
 int attempt=1;
 int max_attempts = 10;
 int ret;
@@ -72,13 +74,16 @@ int main()
 		door_server.listen();
 		bldg_client.set_blocking(false,50);
 		door_server.set_blocking(false,50);
+		data_timer.start();
 		while(1){
 			watchdog_refresh();
 			button_check();
 			connection_status = door_server.accept(bldg_client);
+			Debug_LED_0=0;
 			if(!connection_status){
 				pc.printf("Received Client Connection\n\r");
 				while(bldg_client.is_connected()){
+					Debug_LED_1=0;
 					watchdog_refresh();
 					char data[512];
 					int n;
@@ -87,12 +92,19 @@ int main()
 					if (n>0) {
 						pc.printf("%s sent %s\n\r",bldg_client.get_address(),data);
 						check_stream(data);
-						send_data();
+						if(data_timer.read()>5){
+							send_data();
+							data_timer.reset();
+						}
 					}
 
 				}
+				Debug_LED_1=1;
 			}else{
-				pc.printf("No Connection\n\r");
+				if(data_timer.read()>5){
+					pc.printf("No Connection\n\r");
+					data_timer.reset();
+				}
 			}
 		}
 
@@ -223,8 +235,14 @@ void read_alarm(void){
 	for(int i = 0;i<4;i++){
 		if(ALARM[i].read()==1){
 			alarm_status[i]=true;
+			alarm_signal = true;
 		}
 	}
+
+	if (alarm_signal){
+		send_data();
+	}
+
 
 }
 
