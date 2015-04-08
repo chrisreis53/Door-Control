@@ -17,7 +17,7 @@
 </editorArea>
 <editor activePart="true" focus="true" id="org.eclipse.cdt.ui.editor.CEditor" name="main.cpp" partName="main.cpp" path="C:/Users/Christopher/Documents/GitHub/Door-Control/main.cpp" title="main.cpp" tooltip="C:/Users/Christopher/Documents/GitHub/Door-Control/main.cpp" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/Door_Control/sources/main.cpp"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="2363" selectionTopPixel="2038"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="6497" selectionTopPixel="6438"/>
 </editor>
 </editors>
 <views>
@@ -138,15 +138,6 @@
 <editors>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/Door_Control/sources/main.cpp"/>
 </editors>
-<item historyLabel="main.cpp" index="0">
-<position/>
-</item>
-<item historyLabel="main.cpp" index="0">
-<position/>
-</item>
-<item historyLabel="main.cpp" index="0">
-<position info="not_deleted" x="554" y="0"/>
-</item>
 <item historyLabel="main.cpp" index="0">
 <position info="not_deleted" x="6193" y="0"/>
 </item>
@@ -285,8 +276,17 @@
 <item historyLabel="main.cpp" index="0">
 <position info="not_deleted" x="6479" y="0"/>
 </item>
-<item active="true" historyLabel="main.cpp" index="0">
+<item historyLabel="main.cpp" index="0">
 <position info="not_deleted" x="2739" y="0"/>
+</item>
+<item historyLabel="main.cpp" index="0">
+<position info="not_deleted" x="3014" y="0"/>
+</item>
+<item historyLabel="main.cpp" index="0">
+<position info="not_deleted" x="2762" y="0"/>
+</item>
+<item active="true" historyLabel="main.cpp" index="0">
+<position info="not_deleted" x="2557" y="22"/>
 </item>
 </navigationHistory>
 <input factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/" type="8"/>

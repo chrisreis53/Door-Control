@@ -87,6 +87,7 @@ int main()
 					watchdog_refresh();
 					char data[512];
 					int n;
+					read_alarm();
 					button_check();
 					n = bldg_client.receive(data,512);
 					if (n>0) {
@@ -102,7 +103,7 @@ int main()
 				Debug_LED_1=1;
 			}else{
 				if(data_timer.read()>5){
-					pc.printf("No Connection\n\r");
+					pc.printf("No Connection...ALARM:%d%d%d%d\n\r",ALARM[0].read(),ALARM[1].read(),ALARM[2].read(),ALARM[3].read());
 					data_timer.reset();
 				}
 			}
@@ -233,7 +234,7 @@ void button_check(void){
 void read_alarm(void){
 
 	for(int i = 0;i<4;i++){
-		if(ALARM[i].read()==1){
+		if(ALARM[i].read()==0){
 			alarm_status[i]=true;
 			alarm_signal = true;
 		}
@@ -247,7 +248,7 @@ void read_alarm(void){
 }
 
 void send_data(void){
-
+	read_alarm();
 	char buf[64];
 	sprintf(buf,"ALARM:%i%i%i%i\n\r\0",alarm_status[0],alarm_status[1],alarm_status[2],alarm_status[3]);
 	bldg_client.send(buf,strlen(buf));
