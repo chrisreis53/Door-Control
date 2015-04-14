@@ -6,7 +6,10 @@
 #include "mbed.h"
 #include "WIZnetInterface.h"
 #include "stm32f1xx_hal_iwdg.h"
+#include "strings.h"
 #include <string.h>
+#include "stdio.h"
+#include <stdlib.h>
 
 ////Defines////
 #define ECHO_SERVER_PORT    9999
@@ -22,10 +25,6 @@ void egress_timer(void);
 void button_check(void);
 void read_alarm(void);
 void send_data(void);
-void watchdog_init(void);
-void watchdog_start(void);
-void watchdog_refresh(void);
-void watchdog_status(void);
 
 ////Pin Declarations////
 DigitalOut DOORS[8]={PC_6,PC_7,PC_8,PC_9,PA_8,PA_15,PC_10,PC_11};	//D0,D1,D2,D3,D4D5,D6,D7
@@ -64,11 +63,6 @@ int main()
 {
 	//DOOR:11111111
 	while (1){
-		attempt = 1;
-
-		watchdog_init();
-		watchdog_start();
-		watchdog_refresh();
 		f_ethernet_init();
 		door_server.bind(ECHO_SERVER_PORT);
 		door_server.listen();
@@ -76,7 +70,6 @@ int main()
 		door_server.set_blocking(false,50);
 		data_timer.start();
 		while(1){
-			watchdog_refresh();
 			button_check();
 			connection_status = door_server.accept(bldg_client);
 			Debug_LED_0=0;
@@ -84,7 +77,6 @@ int main()
 				pc.printf("Received Client Connection\n\r");
 				while(bldg_client.is_connected()){
 					Debug_LED_1=0;
-					watchdog_refresh();
 					char data[512];
 					int n;
 					read_alarm();
@@ -93,10 +85,11 @@ int main()
 					if (n>0) {
 						pc.printf("%s sent %s\n\r",bldg_client.get_address(),data);
 						check_stream(data);
-						if(data_timer.read()>5){
-							send_data();
-							data_timer.reset();
-						}
+					}
+					if(data_timer.read()>5){
+						pc.printf("Sending Data\n\r");
+						send_data();
+						data_timer.reset();
 					}
 
 				}
@@ -114,7 +107,6 @@ int main()
 
 void f_ethernet_init()
 {
-	watchdog_refresh();
     uint8_t mac[]={0x90,0xa2,0xDa,0x0d,0x42,0xe0};
     // mbed_mac_address((char *)mac); 
     pc.printf("\n\r####Starting Ethernet Server#### \n\r");
@@ -130,7 +122,6 @@ void f_ethernet_init()
     }
     pc.printf("Connecting to building server @ %s on port %d...\n\r",BLDG_SERVER_IP, ECHO_SERVER_PORT );
     ret = eth.connect();
-    watchdog_refresh();
     if(!ret)
     {
         pc.printf("Connection Established!\n\n\r");
@@ -141,7 +132,6 @@ void f_ethernet_init()
     {
         pc.printf("Communication Failure  ... Restart devices ...\n\r"); 
     }
-    watchdog_refresh();
 }  
 
 void check_stream(char* buf)
@@ -233,10 +223,11 @@ void button_check(void){
 
 void read_alarm(void){
 
-	for(int i = 0;i<4;i++){
+	for(int i = 0;i<1;i++){
 		if(ALARM[i].read()==0){
 			alarm_status[i]=true;
 			alarm_signal = true;
+			pc.printf("Alarm Detected\n\r");
 		}
 	}
 
@@ -249,51 +240,12 @@ void read_alarm(void){
 
 void send_data(void){
 	read_alarm();
-	char buf[64];
+	char* buf;
 	sprintf(buf,"ALARM:%i%i%i%i\n\r\0",alarm_status[0],alarm_status[1],alarm_status[2],alarm_status[3]);
 	bldg_client.send(buf,strlen(buf));
-	char buf_2[64];
+	char* buf_2;
 	sprintf(buf_2,"DOOR:%i%i%i%i%i%i%i%i\n\r\0",door_status[0],door_status[1],door_status[2],door_status[3],door_status[4],door_status[5],door_status[6],door_status[7]);
 	bldg_client.send(buf_2,strlen(buf_2));
+	//bldg_client.send("AS\0DF",5);
 
-}
-
-void watchdog_init(void){
-
-	hiwdg.Instance = IWDG;
-	hiwdg.Init.Prescaler = IWDG_PRESCALER_256;
-	hiwdg.Init.Reload = 2050; //10 seconds (1350)
-	HAL_IWDG_Init(&hiwdg);
-
-}
-
-void watchdog_start(void){
-	HAL_IWDG_Start(&hiwdg);
-}
-
-void watchdog_refresh(void){
-	HAL_IWDG_Refresh(&hiwdg);
-	Debug_LED_0 != Debug_LED_0;
-}
-
-void watchdog_status(void){
-	switch (HAL_IWDG_GetState(&hiwdg)){
-		case HAL_IWDG_STATE_RESET:
-			pc.printf("IWDG not yet initialized or disabled\r\n");
-			break;
-		case HAL_IWDG_STATE_READY:
-			pc.printf("IWDG initialized and ready for use\r\n");
-			break;
-		case HAL_IWDG_STATE_BUSY:
-			pc.printf("IWDG internal process is ongoing\r\n");
-			break;
-		case HAL_IWDG_STATE_TIMEOUT:
-			pc.printf("IWDG timeout state\r\n");
-			break;
-		case HAL_IWDG_STATE_ERROR:
-			pc.printf("IWDG error state\r\n");
-			break;
-		default:
-			pc.printf("Unknown state\n\r");
-	}
 }
