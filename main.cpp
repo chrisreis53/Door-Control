@@ -77,6 +77,7 @@ int main()
 				pc.printf("Received Client Connection\n\r");
 				while(bldg_client.is_connected()){
 					Debug_LED_1=0;
+
 					char data[512];
 					int n;
 					read_alarm();
@@ -90,6 +91,7 @@ int main()
 						pc.printf("Sending Data\n\r");
 						send_data();
 						data_timer.reset();
+						pc.printf("Connected...ALARM:%d%d%d%d\n\r",ALARM[0].read(),ALARM[1].read(),ALARM[2].read(),ALARM[3].read());
 					}
 
 				}
@@ -101,7 +103,6 @@ int main()
 				}
 			}
 		}
-
 	}
 }
 
@@ -233,6 +234,7 @@ void read_alarm(void){
 
 	if (alarm_signal){
 		send_data();
+		pc.printf("Send Alarm Data\n\r");
 	}
 
 
@@ -240,12 +242,15 @@ void read_alarm(void){
 
 void send_data(void){
 	read_alarm();
-	char* buf;
-	sprintf(buf,"ALARM:%i%i%i%i\n\r\0",alarm_status[0],alarm_status[1],alarm_status[2],alarm_status[3]);
+	char buf[] = "ALARM:1234\n\r\0";
+	buf[6]=('0' + int(alarm_status[0]));buf[7]=('0'+int(alarm_status[1]));buf[8]=('0' + int(alarm_status[2]));buf[9]=('0' + int(alarm_status[3]));
+	pc.printf("test");
 	bldg_client.send(buf,strlen(buf));
-	char* buf_2;
-	sprintf(buf_2,"DOOR:%i%i%i%i%i%i%i%i\n\r\0",door_status[0],door_status[1],door_status[2],door_status[3],door_status[4],door_status[5],door_status[6],door_status[7]);
+	pc.printf("Printing Data to server: %s\n\r",buf);
+	char buf_2[] = "DOOR:12345678\n\r\0";
+	buf_2[5] = ('0' + int(door_status[0]));buf_2[6]=('0' + int(door_status[2]));buf_2[7] = ('0' + int(door_status[2]));buf_2[8]=('0' + int(door_status[3]));
+	buf_2[9] = ('0' + int(door_status[4]));buf_2[10]=('0' + int(door_status[5]));buf_2[11] = ('0' + int(door_status[6]));buf_2[12]=('0' + int(door_status[7]));
 	bldg_client.send(buf_2,strlen(buf_2));
-	//bldg_client.send("AS\0DF",5);
+	pc.printf("Printing Data to server: %s\n\r",buf_2);
 
 }
