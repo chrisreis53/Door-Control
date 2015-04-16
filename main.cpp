@@ -71,6 +71,7 @@ int main()
 		data_timer.start();
 		while(1){
 			button_check();
+			read_alarm();
 			connection_status = door_server.accept(bldg_client);
 			Debug_LED_0=0;
 			if(!connection_status){
@@ -225,18 +226,12 @@ void button_check(void){
 void read_alarm(void){
 
 	for(int i = 0;i<1;i++){
-		if(ALARM[i].read()==0){
+		if((ALARM[i].read()==0) && (alarm_status[i]==false)){
 			alarm_status[i]=true;
 			alarm_signal = true;
-			pc.printf("Alarm Detected\n\r");
+			pc.printf("Alarm %i Detected\n\r",i+1);
 		}
 	}
-
-	if (alarm_signal){
-		send_data();
-		pc.printf("Send Alarm Data\n\r");
-	}
-
 
 }
 
