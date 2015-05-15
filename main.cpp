@@ -15,6 +15,62 @@
 #define ECHO_SERVER_PORT    9999
 //#define BLDG_SERVER_IP      "10.10.1.7"
 #define BLDG_SERVER_IP      "192.168.1.103"
+#define NUM_ALARMS			1
+
+//#define TEST
+//#define panicLock0
+ #define panicLock1
+//#define panicLock2
+//#define panicLock3
+//#define panicLock4
+//#define panicLock5
+//#define panicLock6
+//#define panicLock7
+//#define panicLock8
+//#define panicLock9
+//#define panicLock10
+
+
+#if defined(panicLock0)
+uint8_t mac[]={0x00,0x08,0xDC,0x1E,0x72,0x1F };
+const char * IP_Addr    = "10.10.1.100";
+#elif defined(panicLock1)
+uint8_t mac[]={0x00,0x08,0xDC,0x1E,0x72,0xE8 };
+const char * IP_Addr    = "10.10.1.101";
+#elif defined(panicLock2)
+uint8_t mac[]={0x00,0x08,0xDC,0x1E,0x72,0x47 };
+const char * IP_Addr    = "10.10.1.102";
+#elif defined(panicLock3)
+uint8_t mac[]={0x00,0x08,0xDC,0x1E,0x72,0xCF };
+const char * IP_Addr    = "10.10.1.103";
+#elif defined(panicLock4)
+uint8_t mac[]={0x00,0x08,0xDC,0x1E,0x72,0x3D };
+const char * IP_Addr    = "10.10.1.104";
+#elif defined(panicLock5)
+uint8_t mac[]={0x00,0x08,0xDC,0x1E,0x72,0x28 };
+const char * IP_Addr    = "10.10.1.105";
+#elif defined(panicLock6)
+uint8_t mac[]={0x00,0x08,0xDC,0x1E,0x72,0xEB };
+const char * IP_Addr    = "10.10.1.106";
+#elif defined(panicLock7)
+uint8_t mac[]={0x00,0x08,0xDC,0x1E,0x72,0x48 };
+const char * IP_Addr    = "10.10.1.107";
+#elif defined(panicLock8)
+uint8_t mac[]={0x00,0x08,0xDC,0x1E,0x72,0x1E };
+const char * IP_Addr    = "10.10.1.108";
+#elif defined(panicLock9)
+uint8_t mac[]={0x00,0x08,0xDC,0x1E,0x73,0x0C };
+const char * IP_Addr    = "10.10.1.109";
+#elif defined(panicLock10)
+uint8_t mac[]={0x00,0x08,0xDC,0x1E,0x73,0x18 };
+const char * IP_Addr    = "10.10.1.110";
+#endif
+#ifdef TEST
+const char * IP_Addr = "192.168.1.200";
+#endif
+
+const char * IP_Subnet  = "255.255.255.0";
+const char * IP_Gateway = "10.10.1.254";
 
 ////Prototypes////
 void check_stream(char* buf);
@@ -109,11 +165,11 @@ int main()
 
 void f_ethernet_init()
 {
-    uint8_t mac[]={0x90,0xa2,0xDa,0x0d,0x42,0xe0};
+
     // mbed_mac_address((char *)mac); 
     pc.printf("\n\r####Starting Ethernet Server#### \n\r");
     wait(1.0);
-    ret = eth.init(mac);
+    ret = eth.init(mac, IP_Addr, IP_Subnet, IP_Gateway);
     if(!ret)
     {
         pc.printf("Initialized, MAC= %s\n\r",eth.getMACAddress());
@@ -143,17 +199,20 @@ void check_stream(char* buf)
 
         if(buf[i] == 'D' && buf[i+1] == 'O' && buf[i+2] == 'O' && buf[i+3] == 'R' && buf[i+4] == ':') {
             set_doors(buf[i+5]-'0',buf[i+6]-'0',buf[i+7]-'0',buf[i+8]-'0',buf[i+9]-'0',buf[i+10]-'0',buf[i+11]-'0',buf[i+12]-'0');
-            
         }
         if(buf[i] == 'D' && buf[i+1] == 'O' && buf[i+2] == 'O' && buf[i+3] == 'R' && buf[i+4] == ':' && buf[i+5] == 'L' && buf[i+6] == 'O' && buf[i+7] == 'C' && buf[i+8] == 'K') {
             set_doors(1,1,1,1,1,1,1,1);
-
         }
         if(buf[i] == 'D' && buf[i+1] == 'O' && buf[i+2] == 'O' && buf[i+3] == 'R' && buf[i+4] == ':' && buf[i+5] == 'U' && buf[i+6] == 'N' && buf[i+7] == 'L' && buf[i+8] == 'O' && buf[i+9] == 'C' && buf[i+10] == 'k') {
             set_doors(0,0,0,0,0,0,0,0);
-
         }
-
+        if(buf[i] == 'A' && buf[i+1] == 'L' && buf[i+2] == 'A' && buf[i+3] == 'R' && buf[i+4] == 'M' && buf[i+5] == ':' && buf[i+6] == 'A' && buf[i+7] == 'C' && buf[i+8] == 'K') {
+        	for(int i = 0;i<NUM_ALARMS;i++){
+        		if(alarm_status[i]==true){
+        			alarm_status[i]==false;
+        		}
+        	}
+        }
     }
 }
 
@@ -179,10 +238,11 @@ void set_doors(int a, int b, int c, int d, int e, int f, int g, int h){
     door_status[7] = h;
 
     for(int i = 0;i < 8;i++){
-    	if(DOORS[i]!=false){
+    	if(DOORS[i]!=false && (data_timer.read()>5)){
     		sprintf(buffer,"STATUS:%d%d%d%d%d%d%d%d\n\r",door_status[0],door_status[1],door_status[2],door_status[3],door_status[4],door_status[5],door_status[6],door_status[7]);
     		pc.printf(buffer);
     		bldg_client.send(buffer,strlen(buffer));
+    		data_timer.reset();
     		break;
     	}
     }
@@ -225,25 +285,36 @@ void button_check(void){
 
 void read_alarm(void){
 
-	for(int i = 0;i<1;i++){
+//	for(int i = 0;i<1;i++){
+//		if((ALARM[i].read()==0) && (alarm_status[i]==false)){
+//			alarm_status[i]=true;
+//			alarm_signal = true;
+//			pc.printf("Alarm %i Detected\n\r",i+1);
+//		}else if(ALARM[i].read()==1){
+//			alarm_status[i]=false;
+//		}
+//	}
+
+	for(int i = 0;i<NUM_ALARMS;i++){
 		if((ALARM[i].read()==0) && (alarm_status[i]==false)){
-			alarm_status[i]=true;
-			alarm_signal = true;
 			pc.printf("Alarm %i Detected\n\r",i+1);
+			alarm_status[i]=true;
+		}
+		if((ALARM[i].read()==1) && (alarm_status[i]==true)){
+			pc.printf("Alarm %i RESET\n\r",i+1);
+			alarm_status[i]=false;
 		}
 	}
-
 }
 
 void send_data(void){
 	read_alarm();
 	char buf[] = "ALARM:1234\n\r\0";
 	buf[6]=('0' + int(alarm_status[0]));buf[7]=('0'+int(alarm_status[1]));buf[8]=('0' + int(alarm_status[2]));buf[9]=('0' + int(alarm_status[3]));
-	pc.printf("test");
 	bldg_client.send(buf,strlen(buf));
 	pc.printf("Printing Data to server: %s\n\r",buf);
 	char buf_2[] = "DOOR:12345678\n\r\0";
-	buf_2[5] = ('0' + int(door_status[0]));buf_2[6]=('0' + int(door_status[2]));buf_2[7] = ('0' + int(door_status[2]));buf_2[8]=('0' + int(door_status[3]));
+	buf_2[5] = ('0' + int(door_status[0]));buf_2[6]=('0' + int(door_status[1]));buf_2[7] = ('0' + int(door_status[2]));buf_2[8]=('0' + int(door_status[3]));
 	buf_2[9] = ('0' + int(door_status[4]));buf_2[10]=('0' + int(door_status[5]));buf_2[11] = ('0' + int(door_status[6]));buf_2[12]=('0' + int(door_status[7]));
 	bldg_client.send(buf_2,strlen(buf_2));
 	pc.printf("Printing Data to server: %s\n\r",buf_2);
