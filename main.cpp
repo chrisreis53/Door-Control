@@ -19,14 +19,14 @@
 
 //#define TEST
 //#define panicLock0
- #define panicLock1
+//#define panicLock1
 //#define panicLock2
 //#define panicLock3
 //#define panicLock4
 //#define panicLock5
 //#define panicLock6
 //#define panicLock7
-//#define panicLock8
+#define panicLock8
 //#define panicLock9
 //#define panicLock10
 

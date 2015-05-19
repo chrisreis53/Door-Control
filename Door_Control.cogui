@@ -17,7 +17,7 @@
 </editorArea>
 <editor activePart="true" focus="true" id="org.eclipse.cdt.ui.editor.CEditor" name="main.cpp" partName="main.cpp" path="C:/Users/Christopher/Documents/GitHub/Door-Control/main.cpp" title="main.cpp" tooltip="C:/Users/Christopher/Documents/GitHub/Door-Control/main.cpp" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/Door_Control/sources/main.cpp"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="38" selectionTopPixel="0"/>
+<editorState selectionHorizontalPixel="0" selectionLength="27" selectionOffset="8779" selectionTopPixel="8504"/>
 </editor>
 </editors>
 <views>
@@ -305,6 +305,9 @@
 <actionBarAdvisor/>
 </window>
 <mruList>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f10x_iwdg.h" tooltip="Door_Control/headers/mbed/TARGET_NUCLEO_F103RB/stm32f10x_iwdg.h">
+<persistable path="/Door_Control/headers/mbed/TARGET_NUCLEO_F103RB/stm32f10x_iwdg.h"/>
+</file>
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="DNSClient.h" tooltip="Door_Control/headers/WIZnet_Library/WIZnetInterface/DNSClient/DNSClient.h">
 <persistable path="/Door_Control/headers/WIZnet_Library/WIZnetInterface/DNSClient/DNSClient.h"/>
 </file>
@@ -343,9 +346,6 @@
 </file>
 <file factoryID="org.eclipse.cdt.ui.ExternalEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="strings.h" tooltip="C:\Program Files (x86)\GNU Tools ARM Embedded\4.9 2014q4\arm-none-eabi\include\strings.h">
 <persistable path="C:\Program Files (x86)\GNU Tools ARM Embedded\4.9 2014q4\arm-none-eabi\include\strings.h" project="Embedded_web_wiznet"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="gpio_object.h" tooltip="Embedded_web/headers/mbed/TARGET_NUCLEO_F401RE/TARGET_STM/TARGET_NUCLEO_F401RE/gpio_object.h">
-<persistable path="/Embedded_web/headers/mbed/TARGET_NUCLEO_F401RE/TARGET_STM/TARGET_NUCLEO_F401RE/gpio_object.h"/>
 </file>
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="main.cpp" tooltip="Embedded_web/sources/WIZnet_Library/main.cpp">
 <persistable path="/Embedded_web/sources/WIZnet_Library/main.cpp"/>
