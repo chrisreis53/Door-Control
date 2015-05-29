@@ -13,9 +13,9 @@
 
 ////Defines////
 #define ECHO_SERVER_PORT    9999
-//#define BLDG_SERVER_IP      "10.10.1.7"
+//#define BLDG_SERVER_IP    "10.10.1.7"
 #define BLDG_SERVER_IP      "192.168.1.103"
-#define NUM_ALARMS			1
+#define USE_DHCP
 
 //#define TEST
 //#define panicLock0
@@ -34,39 +34,51 @@
 #if defined(panicLock0)
 uint8_t mac[]={0x00,0x08,0xDC,0x1E,0x72,0x1F };
 const char * IP_Addr    = "10.10.1.100";
+#define NUM_ALARMS	2
 #elif defined(panicLock1)
-uint8_t mac[]={0x00,0x08,0xDC,0x1E,0x72,0xE8 };
+uint8_t mac[]={0x00,0x08,0xDC,0x1E,0x72,0x1F };
 const char * IP_Addr    = "10.10.1.101";
+#define NUM_ALARMS	2
 #elif defined(panicLock2)
 uint8_t mac[]={0x00,0x08,0xDC,0x1E,0x72,0x47 };
 const char * IP_Addr    = "10.10.1.102";
+#define NUM_ALARMS	2
 #elif defined(panicLock3)
-uint8_t mac[]={0x00,0x08,0xDC,0x1E,0x72,0xCF };
+uint8_t mac[]={0x00,0x08,0xDC,0x1E,0x72,0x2B };
 const char * IP_Addr    = "10.10.1.103";
+#define NUM_ALARMS	3
 #elif defined(panicLock4)
 uint8_t mac[]={0x00,0x08,0xDC,0x1E,0x72,0x3D };
 const char * IP_Addr    = "10.10.1.104";
+#define NUM_ALARMS	1
 #elif defined(panicLock5)
-uint8_t mac[]={0x00,0x08,0xDC,0x1E,0x72,0x28 };
+uint8_t mac[]={0x00,0x08,0xDC,0x1E,0x72,0xE3 };
 const char * IP_Addr    = "10.10.1.105";
+#define NUM_ALARMS	2
 #elif defined(panicLock6)
-uint8_t mac[]={0x00,0x08,0xDC,0x1E,0x72,0xEB };
+uint8_t mac[]={0x00,0x08,0xDC,0x1E,0x72,0xE8 };
 const char * IP_Addr    = "10.10.1.106";
+#define NUM_ALARMS	3
 #elif defined(panicLock7)
-uint8_t mac[]={0x00,0x08,0xDC,0x1E,0x72,0x48 };
+uint8_t mac[]={0x00,0x08,0xDC,0x1E,0x72,0xDA };
 const char * IP_Addr    = "10.10.1.107";
+#define NUM_ALARMS	1
 #elif defined(panicLock8)
-uint8_t mac[]={0x00,0x08,0xDC,0x1E,0x72,0x1E };
+uint8_t mac[]={0x00,0x08,0xDC,0x1E,0x72,0xCF };
 const char * IP_Addr    = "10.10.1.108";
+#define NUM_ALARMS	3
 #elif defined(panicLock9)
-uint8_t mac[]={0x00,0x08,0xDC,0x1E,0x73,0x0C };
+uint8_t mac[]={0x00,0x08,0xDC,0x1E,0x73,0x1B };
 const char * IP_Addr    = "10.10.1.109";
+#define NUM_ALARMS	2
 #elif defined(panicLock10)
-uint8_t mac[]={0x00,0x08,0xDC,0x1E,0x73,0x18 };
+uint8_t mac[]={0x00,0x08,0xDC,0x1E,0x73,0x1E };
 const char * IP_Addr    = "10.10.1.110";
+#define NUM_ALARMS	2
 #endif
 #ifdef TEST
 const char * IP_Addr = "192.168.1.200";
+#define NUM_ALARMS	2
 #endif
 
 const char * IP_Subnet  = "255.255.255.0";
@@ -169,7 +181,11 @@ void f_ethernet_init()
     // mbed_mac_address((char *)mac); 
     pc.printf("\n\r####Starting Ethernet Server#### \n\r");
     wait(1.0);
-    ret = eth.init(mac, IP_Addr, IP_Subnet, IP_Gateway);
+	#ifdef USE_DHCP
+		int ret = eth.init(mac);
+	#else
+		int ret = eth.init(mac,IP_Addr,IP_Subnet,IP_Gateway);
+	#endif
     if(!ret)
     {
         pc.printf("Initialized, MAC= %s\n\r",eth.getMACAddress());
