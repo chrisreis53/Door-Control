@@ -15,7 +15,7 @@
 #define ECHO_SERVER_PORT    9999
 //#define BLDG_SERVER_IP    "10.10.1.7"
 #define BLDG_SERVER_IP      "192.168.1.103"
-#define USE_DHCP
+//#define USE_DHCP
 
 //#define TEST
 //#define panicLock0
@@ -26,9 +26,9 @@
 //#define panicLock5
 //#define panicLock6
 //#define panicLock7
-#define panicLock8
+//#define panicLock8
 //#define panicLock9
-//#define panicLock10
+#define panicLock10
 
 
 #if defined(panicLock0)
@@ -36,11 +36,11 @@ uint8_t mac[]={0x00,0x08,0xDC,0x1E,0x72,0x1F };
 const char * IP_Addr    = "10.10.1.100";
 #define NUM_ALARMS	2
 #elif defined(panicLock1)
-uint8_t mac[]={0x00,0x08,0xDC,0x1E,0x72,0x1F };
+uint8_t mac[]={0x00,0x08,0xDC,0x1E,0x72,0xE3 };
 const char * IP_Addr    = "10.10.1.101";
 #define NUM_ALARMS	2
 #elif defined(panicLock2)
-uint8_t mac[]={0x00,0x08,0xDC,0x1E,0x72,0x47 };
+uint8_t mac[]={0x00,0x08,0xDC,0x1E,0x72,0x3D };
 const char * IP_Addr    = "10.10.1.102";
 #define NUM_ALARMS	2
 #elif defined(panicLock3)
@@ -48,11 +48,11 @@ uint8_t mac[]={0x00,0x08,0xDC,0x1E,0x72,0x2B };
 const char * IP_Addr    = "10.10.1.103";
 #define NUM_ALARMS	3
 #elif defined(panicLock4)
-uint8_t mac[]={0x00,0x08,0xDC,0x1E,0x72,0x3D };
+uint8_t mac[]={0x00,0x08,0xDC,0x1E,0x72,0x47 };
 const char * IP_Addr    = "10.10.1.104";
 #define NUM_ALARMS	1
 #elif defined(panicLock5)
-uint8_t mac[]={0x00,0x08,0xDC,0x1E,0x72,0xE3 };
+uint8_t mac[]={0x00,0x08,0xDC,0x1E,0x72,0x1F };
 const char * IP_Addr    = "10.10.1.105";
 #define NUM_ALARMS	2
 #elif defined(panicLock6)
