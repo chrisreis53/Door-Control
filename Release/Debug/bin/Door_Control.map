@@ -4065,17 +4065,17 @@ OUTPUT(Door_Control.elf elf32-littlearm)
  .debug_abbrev  0x00002d4b      0x629 ..\obj\DHCPClient.o
  .debug_abbrev  0x00003374      0x445 ..\obj\Endpoint.o
 
-.debug_loc      0x00000000     0x4207
- .debug_loc     0x00000000      0x734 ..\obj\main.o
- .debug_loc     0x00000734      0x4f3 ..\obj\WIZnetInterface.o
- .debug_loc     0x00000c27      0x4a1 ..\obj\TCPSocketConnection.o
- .debug_loc     0x000010c8      0x399 ..\obj\TCPSocketServer.o
- .debug_loc     0x00001461      0x9bd ..\obj\DNSClient.o
- .debug_loc     0x00001e1e      0x5ff ..\obj\UDPSocket.o
- .debug_loc     0x0000241d     0x1619 ..\obj\W5500.o
- .debug_loc     0x00003a36       0x73 ..\obj\Socket.o
- .debug_loc     0x00003aa9      0x695 ..\obj\DHCPClient.o
- .debug_loc     0x0000413e       0xc9 ..\obj\Endpoint.o
+.debug_loc      0x00000000     0x4211
+ .debug_loc     0x00000000      0x73e ..\obj\main.o
+ .debug_loc     0x0000073e      0x4f3 ..\obj\WIZnetInterface.o
+ .debug_loc     0x00000c31      0x4a1 ..\obj\TCPSocketConnection.o
+ .debug_loc     0x000010d2      0x399 ..\obj\TCPSocketServer.o
+ .debug_loc     0x0000146b      0x9bd ..\obj\DNSClient.o
+ .debug_loc     0x00001e28      0x5ff ..\obj\UDPSocket.o
+ .debug_loc     0x00002427     0x1619 ..\obj\W5500.o
+ .debug_loc     0x00003a40       0x73 ..\obj\Socket.o
+ .debug_loc     0x00003ab3      0x695 ..\obj\DHCPClient.o
+ .debug_loc     0x00004148       0xc9 ..\obj\Endpoint.o
 
 .debug_aranges  0x00000000      0x4d8
  .debug_aranges
@@ -4111,17 +4111,17 @@ OUTPUT(Door_Control.elf elf32-littlearm)
  .debug_ranges  0x000009a0      0x140 ..\obj\DHCPClient.o
  .debug_ranges  0x00000ae0       0x70 ..\obj\Endpoint.o
 
-.debug_line     0x00000000     0x44fb
- .debug_line    0x00000000      0xa48 ..\obj\main.o
- .debug_line    0x00000a48      0x6c3 ..\obj\WIZnetInterface.o
- .debug_line    0x0000110b      0x5ab ..\obj\TCPSocketConnection.o
- .debug_line    0x000016b6      0x5e2 ..\obj\TCPSocketServer.o
- .debug_line    0x00001c98      0x782 ..\obj\DNSClient.o
- .debug_line    0x0000241a      0x602 ..\obj\UDPSocket.o
- .debug_line    0x00002a1c      0x9cd ..\obj\W5500.o
- .debug_line    0x000033e9      0x4f9 ..\obj\Socket.o
- .debug_line    0x000038e2      0x70a ..\obj\DHCPClient.o
- .debug_line    0x00003fec      0x50f ..\obj\Endpoint.o
+.debug_line     0x00000000     0x44fc
+ .debug_line    0x00000000      0xa49 ..\obj\main.o
+ .debug_line    0x00000a49      0x6c3 ..\obj\WIZnetInterface.o
+ .debug_line    0x0000110c      0x5ab ..\obj\TCPSocketConnection.o
+ .debug_line    0x000016b7      0x5e2 ..\obj\TCPSocketServer.o
+ .debug_line    0x00001c99      0x782 ..\obj\DNSClient.o
+ .debug_line    0x0000241b      0x602 ..\obj\UDPSocket.o
+ .debug_line    0x00002a1d      0x9cd ..\obj\W5500.o
+ .debug_line    0x000033ea      0x4f9 ..\obj\Socket.o
+ .debug_line    0x000038e3      0x70a ..\obj\DHCPClient.o
+ .debug_line    0x00003fed      0x50f ..\obj\Endpoint.o
 
 .debug_str      0x00000000     0x2b19
  .debug_str     0x00000000     0x1c3f ..\obj\main.o

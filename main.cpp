@@ -26,9 +26,9 @@
 //#define panicLock5
 //#define panicLock6
 //#define panicLock7
-//#define panicLock8
+#define panicLock8
 //#define panicLock9
-#define panicLock10
+//#define panicLock10
 
 
 #if defined(panicLock0)
@@ -77,6 +77,7 @@ const char * IP_Addr    = "10.10.1.110";
 #define NUM_ALARMS	2
 #endif
 #ifdef TEST
+uint8_t mac[]={0x00,0x08,0xDC,0x1E,0x72,0xDA };
 const char * IP_Addr = "192.168.1.200";
 #define NUM_ALARMS	2
 #endif
